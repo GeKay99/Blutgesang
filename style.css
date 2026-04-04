@@ -1,0 +1,993 @@
+        :root {
+            --bg-dark: #000000;
+            --bg-light-dark: #0a0a0a;
+            --text-light: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent-red: #a00000; 
+            --accent-gray: #222;
+            --white: #ffffff;
+            --whatsapp-green: #25D366;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- HEADER & NAV (SPLIT LOOK) --- */
+        header {
+            padding: 10px 0;
+            background: rgba(0, 0, 0, 0.85); /* Transparent */
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--accent-gray);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr; /* Links - Logo - Rechts */
+            align-items: center;
+        }
+
+        .nav-group {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-group.left { justify-content: flex-end; padding-right: 40px; }
+        .nav-group.right { justify-content: flex-start; padding-left: 40px; }
+
+        .nav-group a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s;
+        }
+
+        .nav-group a:hover, .nav-group a.active { color: var(--accent-red); }
+
+        .site-logo {
+            height: 120px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .site-logo:hover { transform: scale(1.05); }
+
+        /* --- HERO SLIDER --- */
+        .hero {
+            height: 85vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .slider-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+        }
+
+        /* Einfacher CSS Slider */
+        .slide {
+            position: absolute;
+            width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: slideFade 15s infinite;
+        }
+
+        .slide:nth-child(1) { background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('img/slider/slider1.jpg'); animation-delay: 0s; }
+        .slide:nth-child(2) { background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('img/slider/slider2.jpg'); animation-delay: 5s; }
+        .slide:nth-child(3) { background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('img/slider/slider3.jpg'); animation-delay: 10s; }
+
+        @keyframes slideFade {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            33% { opacity: 1; }
+            43% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        .hero-content h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            color: var(--white);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* --- ARTIST SECTION --- */
+        .artist-preview { padding: 100px 0; }
+        .artist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .artist-card {
+            position: relative;
+            background: var(--bg-light-dark);
+            border: 1px solid var(--accent-gray);
+            overflow: hidden;
+            transition: 0.4s;
+        }
+
+        .artist-card:hover { border-color: var(--accent-red); }
+
+        .artist-card img {
+            width: 100%; height: 550px;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: 0.6s ease;
+        }
+
+        .artist-card:hover img { filter: grayscale(0%); transform: scale(1.03); }
+
+        .artist-info { padding: 30px; text-align: center; }
+        .artist-info h3 { font-family: 'Cinzel', serif; font-size: 1.8rem; margin-bottom: 10px; }
+        .artist-info span { color: var(--accent-red); text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; }
+
+        /* --- STICKY WHATSAPP SELECTOR --- */
+        .wa-sticky {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .wa-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s all ease;
+        }
+
+        .wa-sticky:hover .wa-options {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .wa-btn {
+            background: var(--whatsapp-green);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            white-space: nowrap;
+            transition: 0.3s;
+        }
+
+        .wa-btn:hover { transform: scale(1.05); background: #1eb954; }
+
+        .wa-main-trigger {
+            width: 60px; height: 60px;
+            background: var(--whatsapp-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .wa-main-trigger svg { width: 30px; fill: white; }
+
+        /* --- MOBILE ADAPTATION --- */
+        @media (max-width: 900px) {
+            nav { grid-template-columns: 1fr; text-align: center; }
+            .nav-group { flex-direction: column; gap: 15px; padding: 20px 0; align-items: center; }
+            .nav-group.left, .nav-group.right { justify-content: center; padding: 0; }
+            .site-logo { height: 80px; order: -1; } /* Logo nach oben */
+            .artist-grid { grid-template-columns: 1fr; }
+        }
+        /* --- FOOTER STYLES --- */
+.site-footer {
+    background-color: var(--bg-light-dark);
+    border-top: 1px solid var(--accent-gray);
+    padding: 60px 0 20px 0;
+    margin-top: 50px;
+    color: var(--text-muted);
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.footer-logo {
+    height: 60px;
+    margin-bottom: 15px;
+    filter: grayscale(100%);
+}
+
+.footer-section h4 {
+    color: var(--white);
+    font-family: 'Cinzel', serif;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 10px;
+}
+
+.footer-section a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.footer-section a:hover {
+    color: var(--accent-red);
+}
+
+.social-links a {
+    color: var(--text-light);
+    display: inline-block;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.social-links a:hover {
+    transform: translateY(-3px);
+    color: var(--accent-red);
+}
+
+.footer-bottom {
+    border-top: 1px solid #111;
+    padding-top: 20px;
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+/* Mobile Fix für den Footer */
+@media (max-width: 600px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- ARTIST CARD BUTTON UPDATE --- */
+.artist-info .portfolio-btn {
+    display: inline-block;
+    background: transparent;
+    color: var(--white);
+    text-decoration: none;
+    padding: 12px 30px;
+    border: 2px solid var(--accent-red); /* Roter Rand */
+    border-radius: 5px; /* Leicht abgerundet */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-top: 15px;
+    transition: all 0.3s ease-out;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.artist-info .portfolio-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background-color: var(--accent-red);
+    z-index: -1;
+    transition: all 0.3s ease-out;
+}
+
+.artist-info .portfolio-btn:hover {
+    color: var(--white);
+    border-color: var(--accent-red);
+}
+
+.artist-info .portfolio-btn:hover::after {
+    height: 100%;
+}
+
+/* --- FOOTER INSTAGRAM UPDATE --- */
+.site-footer {
+    padding-bottom: 30px; /* Mehr Platz unten */
+}
+
+.footer-insta-area {
+    margin-top: 50px;
+    margin-bottom: 30px;
+    border-top: 1px solid #111;
+    padding-top: 40px;
+    text-align: center;
+}
+
+.footer-insta-area h4 {
+    color: var(--white);
+    font-family: 'Cinzel', serif;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: 2px;
+}
+
+.insta-links-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap; /* Wichtig für Mobile */
+}
+
+.insta-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--bg-light-dark);
+    color: var(--text-light);
+    text-decoration: none;
+    padding: 15px 25px;
+    border: 1px solid var(--accent-gray);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    width: min-content; /* Verhindert volle Breite */
+    white-space: nowrap;
+}
+
+.insta-btn svg {
+    width: 20px;
+    fill: currentColor;
+    transition: transform 0.3s ease;
+}
+
+.insta-btn span {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.insta-btn:hover {
+    border-color: var(--accent-red);
+    background-color: #0d0d0d;
+    color: var(--white);
+}
+
+.insta-btn:hover svg {
+    transform: scale(1.1);
+}
+
+/* --- MOBILE ADAPTATION FOR NEW FOOTER --- */
+@media (max-width: 600px) {
+    .insta-links-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .insta-btn {
+        width: 100%; /* Volle Breite auf Mobile */
+        justify-content: center;
+    }
+}
+
+/* --- HAMBURGER LOGIK & DESKTOP HIDING --- */
+.nav-toggle {
+    display: none; /* Checkbox immer verstecken */
+}
+
+.hamburger {
+    display: none; /* Auf Desktop versteckt */
+    cursor: pointer;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 2001;
+}
+
+.hamburger span {
+    display: block;
+    width: 30px;
+    height: 2px;
+    background-color: var(--white);
+    transition: 0.3s;
+}
+
+.mobile-menu {
+    display: none; /* Standardmäßig aus auf Desktop */
+}
+
+/* --- HILFSKLASSE FÜR MOBILE SPACER --- */
+.desktop-only-reverse { display: none; } /* Standardmäßig versteckt */
+
+/* --- MOBILE OPTIMIERUNG (Breakpoint 900px oder kleiner) --- */
+@media (max-width: 900px) {
+    /* Header & Nav Layout */
+    nav {
+        display: flex;
+        justify-content: space-between; /* Verteilt Spacer - Logo - Hamburger */
+        align-items: center;
+        /* height: 80px;  <-- GELÖSCHT! Verursachte das Herauswagen */
+        padding: 15px 20px; /* Nutze Padding, um die Höhe flexibel zu machen */
+    }
+
+    .desktop-only {
+        display: none; /* Versteckt die Desktop-Links */
+    }
+
+    .desktop-only-reverse {
+        display: block; /* Zeigt den Spacer auf Mobile */
+        width: 30px; /* Gleiche Breite wie Hamburger für perfekte Zentrierung */
+    }
+
+    /* NEUE LOGO-GRÖSSE UND POSITIONIERUNG */
+    .site-logo {
+        height: 72px; /* <-- AKTUALISIERT! (60px * 1.2 = 72px, also 20% größer) */
+        width: auto;
+        /* position: absolute;  <-- GELÖSCHT! Führt oft zu Überlauf */
+        /* left: 50%;           <-- GELÖSCHT! */
+        /* transform: ...;     <-- GELÖSCHT! */
+    }
+
+    /* Hamburger Positionierung */
+    .hamburger {
+        display: flex; /* Jetzt sichtbar */
+        position: relative; /* Nicht mehr absolut, wird durch flex positioniert */
+        right: 0;
+        width: 30px; /* Feste Breite für den Spacer-Vergleich */
+    }
+
+    /* Das ausklappbare Menü */
+    .mobile-menu {
+        display: block;
+        position: fixed;
+        top: 0;
+        right: -100%; /* Versteckt außerhalb des Bildschirms */
+        width: 80%;
+        height: 100vh;
+        background: rgba(10, 10, 10, 0.99); /* Fast deckend */
+        backdrop-filter: blur(15px);
+        padding-top: 100px;
+        transition: 0.4s ease-in-out;
+        z-index: 2000;
+        border-left: 1px solid var(--accent-red);
+    }
+
+    .mobile-menu ul {
+        list-style: none;
+        text-align: center;
+    }
+
+    .mobile-menu ul li {
+        margin: 30px 0;
+    }
+
+    .mobile-menu ul a {
+        text-decoration: none;
+        color: var(--white);
+        font-family: 'Cinzel', serif;
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+    }
+
+    /* Öffnen-Animation */
+    .nav-toggle:checked ~ .mobile-menu {
+        right: 0;
+    }
+
+    /* Hamburger zu "X" Animation */
+    .nav-toggle:checked ~ .hamburger span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+    .nav-toggle:checked ~ .hamburger span:nth-child(2) { opacity: 0; }
+    .nav-toggle:checked ~ .hamburger span:nth-child(3) { transform: rotate(-45deg) translate(6px, -7px); }
+
+    /* --- ARTIST CARDS MOBILE ABSTAND --- */
+    .artist-preview {
+        padding: 60px 30px; /* Erhöhter Seitenabstand zum Rand */
+    }
+
+    .artist-grid {
+        grid-template-columns: 1fr;
+        gap: 40px; /* Mehr Platz zwischen den Karten untereinander */
+    }
+
+    .artist-card {
+        max-width: 500px; /* Damit die Karten auf Tablets nicht riesig werden */
+        margin: 0 auto;  /* Zentriert die Karten im Grid */
+    }
+}
+
+/* --- SUB-HERO (Artists Seite) --- */
+.hero-sub {
+    height: 40vh; /* Etwas kleiner als der Haupt-Slider */
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img/studio-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* --- ARTIST DETAIL CARDS --- */
+.artist-detail-list {
+    padding: 80px 20px;
+}
+
+.artist-detail-card {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+    margin-bottom: 100px;
+}
+
+.artist-detail-card.reverse {
+    flex-direction: row-reverse;
+}
+
+.artist-image {
+    flex: 1;
+}
+
+.artist-image img {
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid var(--accent-gray);
+    filter: grayscale(100%);
+    transition: 0.5s;
+}
+
+.artist-detail-card:hover .artist-image img {
+    filter: grayscale(0%);
+    border-color: var(--accent-red);
+}
+
+.artist-text {
+    flex: 1;
+}
+
+.artist-text span {
+    color: var(--accent-red);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+}
+
+.artist-text h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.artist-text p {
+    margin-bottom: 30px;
+    color: var(--text-muted);
+}
+
+.artist-actions {
+    display: flex;
+    gap: 20px;
+}
+
+.wa-btn-secondary {
+    text-decoration: none;
+    color: var(--white);
+    border-bottom: 1px solid var(--accent-red);
+    padding: 5px 0;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.wa-btn-secondary:hover {
+    color: var(--accent-red);
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 900px) {
+    .artist-detail-card, .artist-detail-card.reverse {
+        flex-direction: column;
+        text-align: center;
+        gap: 30px;
+    }
+    
+    .artist-actions {
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* --- ARTIST PAGE LAYOUT --- */
+.artists-hero {
+    height: 40vh;
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img/slider/slider1.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.artist-showcase {
+    padding: 100px 20px;
+}
+
+.artist-profile {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    margin-bottom: 120px;
+}
+
+.artist-profile.reverse {
+    flex-direction: row-reverse;
+}
+
+.artist-image-box {
+    flex: 1;
+}
+
+.artist-image-box img {
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid var(--accent-gray);
+    filter: grayscale(100%);
+    transition: 0.5s ease;
+}
+
+.artist-profile:hover .artist-image-box img {
+    filter: grayscale(0%);
+    border-color: var(--accent-red);
+}
+
+.artist-description {
+    flex: 1;
+}
+
+.artist-description span {
+    color: var(--accent-red);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+}
+
+.artist-description h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    margin: 15px 0;
+}
+
+.artist-description p {
+    color: var(--text-muted);
+    margin-bottom: 30px;
+    max-width: 500px;
+}
+
+/* --- GLOBAL PORTFOLIO BUTTON STYLE --- */
+.portfolio-btn {
+    display: inline-block;
+    padding: 14px 35px;
+    border: 2px solid var(--accent-red);
+    color: var(--white);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    position: relative;
+    z-index: 1;
+    transition: 0.3s ease;
+    background: transparent;
+}
+
+.portfolio-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 0;
+    background: var(--accent-red);
+    z-index: -1;
+    transition: 0.3s ease;
+}
+
+.portfolio-btn:hover::after {
+    height: 100%;
+}
+
+.portfolio-btn:hover {
+    color: var(--white);
+}
+
+/* --- MOBILE ARTIST PAGE --- */
+@media (max-width: 900px) {
+    .artist-profile, .artist-profile.reverse {
+        flex-direction: column;
+        text-align: center;
+        gap: 30px;
+    }
+    
+    .artist-description p {
+        margin: 0 auto 30px auto;
+    }
+}
+
+/* --- PORTFOLIO PAGE STYLES --- */
+.portfolio-hero {
+    padding: 80px 0 40px 0;
+    text-align: center;
+    border-bottom: 1px solid var(--accent-gray);
+    background: linear-gradient(to bottom, #050505, #000);
+}
+
+.portfolio-hero span {
+    color: var(--accent-red);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 0.8rem;
+}
+
+.portfolio-hero h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin: 10px 0;
+}
+
+/* Galerie Grid */
+.portfolio-gallery {
+    padding: 60px 20px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.gallery-item {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background-color: var(--bg-light-dark);
+    border: 1px solid var(--accent-gray);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(30%);
+    transition: all 0.5s ease;
+}
+
+.gallery-item:hover img {
+    filter: grayscale(0%);
+    transform: scale(1.05);
+}
+
+/* CTA & Back Button */
+.cta-area {
+    margin-top: 80px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.back-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.back-link:hover {
+    color: var(--white);
+}
+
+/* --- MOBILE GALLERY FIX --- */
+@media (max-width: 600px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 Bilder nebeneinander auf Mobile */
+        gap: 10px;
+    }
+    
+    .portfolio-gallery {
+        padding: 40px 10px; /* Weniger Rand auf kleinen Displays */
+    }
+}
+
+
+/* --- ARTIST DETAIL VIEW --- */
+.artist-detail-header {
+    padding: 60px 20px;
+    margin-top: 20px;
+}
+
+.detail-grid {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    background: var(--bg-light-dark);
+    padding: 40px;
+    border: 1px solid var(--accent-gray);
+}
+
+.detail-image {
+    flex: 0 0 350px; /* Feste Breite für das Portrait auf Desktop */
+}
+
+.detail-image img {
+    width: 100%;
+    border: 1px solid var(--accent-red);
+    display: block;
+}
+
+.detail-text {
+    flex: 1;
+}
+
+.detail-text span {
+    color: var(--accent-red);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+}
+
+.detail-text h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    margin: 10px 0 20px 0;
+}
+
+.detail-text p {
+    color: var(--text-muted);
+    margin-bottom: 30px;
+    line-height: 1.8;
+}
+
+/* Galerie Sektion */
+.section-title {
+    font-family: 'Cinzel', serif;
+    text-align: center;
+    margin: 60px 0 40px 0;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-size: 1.5rem;
+    color: var(--white);
+}
+
+.back-area {
+    margin-top: 50px;
+    text-align: center;
+}
+
+.back-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.back-link:hover {
+    color: var(--accent-red);
+}
+
+/* --- MOBILE OPTIMIERUNG --- */
+@media (max-width: 900px) {
+    .detail-grid {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+        gap: 30px;
+    }
+
+    .detail-image {
+        flex: 0 0 auto;
+        width: 80%;
+        max-width: 300px;
+    }
+
+    .detail-text h1 {
+        font-size: 2rem;
+    }
+}
+
+/* --- ANFAHRT PAGE --- */
+.anfahrt-section {
+    padding: 80px 20px;
+}
+
+.anfahrt-grid {
+    display: flex;
+    gap: 60px;
+    min-height: 500px;
+}
+
+.anfahrt-info {
+    flex: 1;
+}
+
+.anfahrt-info span {
+    color: var(--accent-red);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+}
+
+.anfahrt-info h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    margin: 10px 0 40px 0;
+}
+
+.info-block {
+    margin-bottom: 40px;
+}
+
+.info-block h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: var(--white);
+    margin-bottom: 10px;
+}
+
+.info-block p {
+    color: var(--text-muted);
+}
+
+.anfahrt-map {
+    flex: 1.5;
+    background: var(--bg-light-dark);
+    border: 1px solid var(--accent-gray);
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+}
+
+/* --- MOBILE ANFAHRT --- */
+@media (max-width: 900px) {
+    .anfahrt-grid {
+        flex-direction: column;
+        gap: 40px;
+    }
+    
+    .anfahrt-info h1 {
+        font-size: 2.2rem;
+    }
+    
+    .anfahrt-map {
+        height: 350px;
+    }
+}
