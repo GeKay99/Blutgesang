@@ -1,0 +1,11 @@
+{
+  "slides": [
+    { "src": "img/slider/slider1.jpeg", "alt": "Tattoo Kunst – Blutgesang Studio" },
+    { "src": "img/slider/slider2.jpeg", "alt": "Fineline Tattoo – Blutgesang Studio" },
+    { "src": "img/slider/slider3.jpeg", "alt": "Dark Art Tattoo – Blutgesang Studio" },
+    { "src": "img/slider/slider4.jpeg", "alt": "Blackwork Tattoo – Blutgesang Studio" },
+    { "src": "img/slider/slider5.jpeg", "alt": "Realistic Tattoo – Blutgesang Studio" },
+    { "src": "img/slider/slider6.jpeg", "alt": "Tattoo Kunst – Blutgesang Studio" }
+  ],
+  "interval": 5000
+}

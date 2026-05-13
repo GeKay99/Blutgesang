@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS | Blutgesang Tattoo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ─────────────────────────────────────────────────────── -->
+<div id="login-screen" class="login-screen" style="display:none">
+    <div class="login-box">
+        <img src="../img/logos/logo.png" alt="Blutgesang" class="logo">
+        <h1>CMS Login</h1>
+        <p>Bitte Passwort eingeben um fortzufahren.</p>
+        <div id="login-alert" class="alert" style="display:none"></div>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="pw-input">Passwort</label>
+                <input type="password" id="pw-input" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%">Anmelden</button>
+        </form>
+    </div>
+</div>
+
+<!-- ── ADMIN LAYOUT ─────────────────────────────────────────────────────── -->
+<div id="admin-layout" class="admin-layout" style="display:none">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="../img/logos/logo.png" alt="Blutgesang">
+            <p>Content Manager</p>
+        </div>
+        <ul class="sidebar-nav">
+            <li>
+                <a href="#" data-section="dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#" data-section="slider">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="15" rx="1"/>
+                        <path d="M16 2l-4 5-4-5"/>
+                    </svg>
+                    Slider
+                </a>
+            </li>
+            <li>
+                <a href="#" data-section="portfolio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="1"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                    Portfolios
+                </a>
+            </li>
+            <li>
+                <a href="#" data-section="news">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h4"/>
+                    </svg>
+                    News
+                </a>
+            </li>
+            <li>
+                <a href="#" data-section="settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                    </svg>
+                    Einstellungen
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="../index.html" target="_blank">← Zur Website</a>
+            <button id="logout-btn" class="btn btn-secondary btn-sm" style="width:100%">Abmelden</button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+
+        <!-- ── DASHBOARD ──────────────────────────────────────────────── -->
+        <section id="section-dashboard" class="admin-section">
+            <div class="section-header">
+                <h1>Dashboard</h1>
+                <p>Übersicht aller Inhalte</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-num" id="stat-slides">–</div>
+                    <div class="stat-label">Slider Bilder</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num" id="stat-misa">–</div>
+                    <div class="stat-label">Portfolio Misa</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num" id="stat-jeydem">–</div>
+                    <div class="stat-label">Portfolio Jeydem</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num" id="stat-posts">–</div>
+                    <div class="stat-label">News (veröffentlicht)</div>
+                </div>
+            </div>
+            <div class="alert alert-info" style="max-width:600px">
+                <strong>Hinweis:</strong> Änderungen werden direkt in die GitHub-Repository committed und GitHub Pages aktualisiert sich innerhalb weniger Minuten. GitHub-Einstellungen bitte zuerst unter <em>Einstellungen</em> konfigurieren.
+            </div>
+        </section>
+
+        <!-- ── SLIDER ─────────────────────────────────────────────────── -->
+        <section id="section-slider" class="admin-section">
+            <div class="section-header">
+                <h1>Slider</h1>
+                <p>Bilder des Startseiten-Sliders verwalten</p>
+            </div>
+            <div id="slider-save-alert" class="alert" style="display:none"></div>
+
+            <ul id="slider-list" class="item-list"></ul>
+
+            <h3 style="margin: 28px 0 16px; font-weight:400">Neues Bild hinzufügen</h3>
+            <form id="add-slide-form" style="max-width:500px">
+                <div class="form-group">
+                    <label>Pfad (relativ zur Website, z.B. img/slider/neu.jpeg)</label>
+                    <input type="text" id="slide-src" placeholder="img/slider/slider7.jpeg" required>
+                </div>
+                <div class="form-group">
+                    <label>Alt-Text</label>
+                    <input type="text" id="slide-alt" placeholder="Beschreibung des Bildes">
+                </div>
+                <button type="submit" class="btn btn-secondary">Hinzufügen</button>
+            </form>
+
+            <div class="btn-group">
+                <button id="save-slider-btn" class="btn btn-primary">Auf GitHub speichern</button>
+                <button class="btn btn-secondary" data-export="slider">JSON herunterladen</button>
+            </div>
+        </section>
+
+        <!-- ── PORTFOLIOS ─────────────────────────────────────────────── -->
+        <section id="section-portfolio" class="admin-section">
+            <div class="section-header">
+                <h1>Portfolios</h1>
+                <p>Portfolio-Bilder der Artists verwalten</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="tab-misa">Misa</button>
+                <button class="tab-btn" data-tab="tab-jeydem">Jeydem</button>
+            </div>
+
+            <!-- Misa Tab -->
+            <div id="tab-misa" class="tab-panel active">
+                <div id="misa-save-alert" class="alert" style="display:none"></div>
+                <ul id="portfolio-list-misa" class="item-list"></ul>
+
+                <h3 style="margin: 28px 0 16px; font-weight:400">Bild hinzufügen</h3>
+                <form id="add-misa-form" style="max-width:500px">
+                    <div class="form-group">
+                        <label>Pfad (z.B. img/portfolio/misa/7.png)</label>
+                        <input type="text" id="misa-img-src" placeholder="img/portfolio/misa/7.png" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Alt-Text</label>
+                        <input type="text" id="misa-img-alt" placeholder="Fineline Tattoo von Misa">
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Hinzufügen</button>
+                </form>
+                <div class="btn-group">
+                    <button id="save-misa-btn" class="btn btn-primary">Auf GitHub speichern</button>
+                    <button class="btn btn-secondary" data-export="misa">JSON herunterladen</button>
+                </div>
+            </div>
+
+            <!-- Jeydem Tab -->
+            <div id="tab-jeydem" class="tab-panel">
+                <div id="jeydem-save-alert" class="alert" style="display:none"></div>
+                <ul id="portfolio-list-jeydem" class="item-list"></ul>
+
+                <h3 style="margin: 28px 0 16px; font-weight:400">Bild hinzufügen</h3>
+                <form id="add-jeydem-form" style="max-width:500px">
+                    <div class="form-group">
+                        <label>Pfad (z.B. img/portfolio/jeydem/7.png)</label>
+                        <input type="text" id="jeydem-img-src" placeholder="img/portfolio/jeydem/7.png" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Alt-Text</label>
+                        <input type="text" id="jeydem-img-alt" placeholder="Dark Art Tattoo von Jeydem">
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Hinzufügen</button>
+                </form>
+                <div class="btn-group">
+                    <button id="save-jeydem-btn" class="btn btn-primary">Auf GitHub speichern</button>
+                    <button class="btn btn-secondary" data-export="jeydem">JSON herunterladen</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── NEWS ───────────────────────────────────────────────────── -->
+        <section id="section-news" class="admin-section">
+            <div class="section-header">
+                <h1>News</h1>
+                <p>Blog-Beiträge erstellen und verwalten</p>
+            </div>
+            <div id="news-save-alert" class="alert" style="display:none"></div>
+
+            <button id="new-post-btn" class="btn btn-primary" style="margin-bottom:24px">+ Neuer Beitrag</button>
+
+            <div id="news-post-list" class="post-list"></div>
+
+            <!-- Post editor (hidden by default) -->
+            <div id="post-form-section" style="display:none; margin-top:32px">
+                <h2 id="post-form-title" style="margin-bottom:20px; font-weight:400; font-size:1.2rem">Neuer Beitrag</h2>
+                <form id="post-form" style="max-width:720px">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Titel *</label>
+                            <input type="text" id="post-title" placeholder="Titel des Beitrags" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Datum *</label>
+                            <input type="date" id="post-date" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Kurzbeschreibung (Excerpt) *</label>
+                        <textarea id="post-excerpt" rows="3" placeholder="Kurze Zusammenfassung für die Übersicht..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Inhalt (HTML erlaubt) *</label>
+                        <textarea id="post-content" rows="10" placeholder="&lt;p&gt;Vollständiger Beitragsinhalt...&lt;/p&gt;" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tags (kommagetrennt)</label>
+                            <input type="text" id="post-tags" placeholder="Studio, News, Kunst">
+                        </div>
+                        <div class="form-group">
+                            <label>Titelbild (Pfad)</label>
+                            <input type="text" id="post-image" placeholder="img/news/beitrag.jpg">
+                        </div>
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:center;gap:10px">
+                        <input type="checkbox" id="post-published" style="width:auto">
+                        <label for="post-published" style="margin:0;text-transform:none;font-size:0.9rem">Veröffentlicht (sofort sichtbar)</label>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">Speichern</button>
+                        <button type="button" id="cancel-post-btn" class="btn btn-secondary">Abbrechen</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group" style="margin-top:32px; padding-top:24px; border-top:1px solid var(--border)">
+                <button id="save-news-btn" class="btn btn-primary">Alle Änderungen auf GitHub speichern</button>
+                <button class="btn btn-secondary" data-export="news">JSON herunterladen</button>
+            </div>
+        </section>
+
+        <!-- ── SETTINGS ───────────────────────────────────────────────── -->
+        <section id="section-settings" class="admin-section">
+            <div class="section-header">
+                <h1>Einstellungen</h1>
+                <p>GitHub-Verbindung und Sicherheit konfigurieren</p>
+            </div>
+
+            <div class="settings-card">
+                <h2>GitHub Repository</h2>
+                <div id="settings-alert" class="alert" style="display:none"></div>
+                <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:20px">
+                    Erstelle ein <strong>Personal Access Token</strong> unter GitHub → Settings → Developer settings → Personal access tokens.
+                    Der Token benötigt den Scope <code>repo</code> (oder <code>contents: write</code> für Fine-grained tokens).
+                </p>
+                <form id="settings-github-form">
+                    <div class="form-group">
+                        <label>Personal Access Token</label>
+                        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>GitHub Benutzername / Organisation</label>
+                            <input type="text" id="gh-owner" placeholder="dein-username">
+                        </div>
+                        <div class="form-group">
+                            <label>Repository-Name</label>
+                            <input type="text" id="gh-repo" placeholder="Blutgesang">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Branch</label>
+                        <input type="text" id="gh-branch" placeholder="main">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </form>
+            </div>
+
+            <div class="settings-card">
+                <h2>Passwort ändern</h2>
+                <div id="pw-alert" class="alert" style="display:none"></div>
+                <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:20px">
+                    Standard-Passwort: <code>BlutgesangAdmin</code> – bitte nach dem ersten Login ändern.
+                    Das Passwort wird als SHA-256-Hash im LocalStorage des Browsers gespeichert.
+                </p>
+                <form id="settings-pw-form">
+                    <div class="form-group">
+                        <label>Neues Passwort (min. 8 Zeichen)</label>
+                        <input type="password" id="new-pw" placeholder="Neues Passwort" autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label>Passwort bestätigen</label>
+                        <input type="password" id="new-pw2" placeholder="Passwort wiederholen" autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Passwort ändern</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

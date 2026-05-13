@@ -1,0 +1,11 @@
+{
+  "artist": "Misa",
+  "gallery": [
+    { "src": "img/portfolio/misa/1.png", "alt": "Fineline Tattoo von Misa" },
+    { "src": "img/portfolio/misa/2.png", "alt": "Blackwork von Misa" },
+    { "src": "img/portfolio/misa/3.png", "alt": "Fineline Tattoo von Misa" },
+    { "src": "img/portfolio/misa/4.png", "alt": "Fineline Tattoo von Misa" },
+    { "src": "img/portfolio/misa/5.png", "alt": "Blackwork von Misa" },
+    { "src": "img/portfolio/misa/6.png", "alt": "Fineline Tattoo von Misa" }
+  ]
+}

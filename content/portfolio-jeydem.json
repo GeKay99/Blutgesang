@@ -1,0 +1,11 @@
+{
+  "artist": "Jeydem",
+  "gallery": [
+    { "src": "img/portfolio/jeydem/1.png", "alt": "Realistic Tattoo von Jeydem" },
+    { "src": "img/portfolio/jeydem/2.png", "alt": "Dark Art von Jeydem" },
+    { "src": "img/portfolio/jeydem/3.png", "alt": "Realistic Tattoo von Jeydem" },
+    { "src": "img/portfolio/jeydem/4.png", "alt": "Dark Art von Jeydem" },
+    { "src": "img/portfolio/jeydem/5.png", "alt": "Realistic Tattoo von Jeydem" },
+    { "src": "img/portfolio/jeydem/6.png", "alt": "Dark Art von Jeydem" }
+  ]
+}

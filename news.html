@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blutgesang Tattoo | Modern Art & Studio</title>
+    <title>News | Blutgesang Tattoo</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,7 +15,7 @@
         <div class="nav-mobile-spacer desktop-only-reverse"></div>
 
         <ul class="nav-group left desktop-only">
-            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="index.html">Home</a></li>
             <li><a href="artists.html">Artists</a></li>
             <li><a href="ueber-uns.html">Über uns</a></li>
         </ul>
@@ -25,7 +25,7 @@
         </a>
 
         <ul class="nav-group right desktop-only">
-            <li><a href="news.html">News</a></li>
+            <li><a href="news.html" class="active">News</a></li>
             <li><a href="anfahrt.html">Anfahrt</a></li>
         </ul>
 
@@ -49,40 +49,33 @@
 </header>
 
 <main>
-    <!-- Hero slider – slides are injected by js/main.js from content/slider.json -->
-    <section class="hero">
-        <div class="slider-bg" id="slider-bg">
-            <!-- Fallback slide shown if JS/fetch fails -->
-            <div class="slide active" style="background-image:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('img/slider/slider1.jpeg')"></div>
-        </div>
+    <!-- Sub-hero -->
+    <section class="hero-sub">
         <div class="hero-content">
-            <h1>Blutgesang Tattoo</h1>
-            <p>Individualität, die unter die Haut geht.</p>
+            <h1>News & Updates</h1>
+            <p>Aktuelles aus dem Studio – Neuigkeiten, Projekte und mehr.</p>
         </div>
     </section>
 
-    <section class="artist-preview container">
-        <div class="artist-grid">
-            <article class="artist-card">
-                <img src="img/artists/misa.png" alt="Misa Tattoo">
-                <div class="artist-info">
-                    <span>Fineline & Blackwork</span>
-                    <h3>Misa Tattoo</h3>
-                    <a href="artist-misa.html" class="portfolio-btn">Portfolio</a>
-                </div>
-            </article>
-            <article class="artist-card">
-                <img src="img/artists/jeydem.png" alt="Jeydem Tattoo">
-                <div class="artist-info">
-                    <span>Realistic & Dark Art</span>
-                    <h3>Jeydem Tattoo</h3>
-                    <a href="artist-jeydem.html" class="portfolio-btn">Portfolio</a>
-                </div>
-            </article>
+    <!-- News grid -->
+    <section class="news-section container">
+        <div id="news-grid" class="news-grid">
+            <!-- Dynamically filled by js/news.js -->
+            <p class="news-empty">Beiträge werden geladen…</p>
         </div>
     </section>
 </main>
 
+<!-- Post modal -->
+<div id="post-modal" class="post-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div id="modal-backdrop" class="post-modal-backdrop"></div>
+    <div class="post-modal-inner">
+        <button id="modal-close-btn" class="modal-close" aria-label="Schließen">&times;</button>
+        <div id="post-modal-content" class="post-modal-content"></div>
+    </div>
+</div>
+
+<!-- WhatsApp sticky -->
 <div class="wa-sticky">
     <div class="wa-options">
         <a href="https://wa.me/491734259463?text=Hallo%20Misa%2C%20ich%20m%C3%B6chte%20einen%20Termin%20anfragen." class="wa-btn">Anfrage Misa Tattoo</a>
@@ -136,5 +129,6 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script src="js/news.js"></script>
 </body>
 </html>
