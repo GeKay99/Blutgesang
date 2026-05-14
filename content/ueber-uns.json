@@ -1,0 +1,38 @@
+{
+  "hero": {
+    "subtitle": "Zwei Künstler. Eine Vision. Tattoo-Kunst auf höchstem Niveau."
+  },
+  "story": {
+    "tag": "Unsere Geschichte",
+    "heading": "Aus Leidenschaft geboren",
+    "text1": "Blutgesang Tattoo ist mehr als ein Studio – es ist ein Ort, an dem Kunst und Haut verschmelzen. Gegründet von zwei Künstlern mit unterschiedlichen Stilen und einer gemeinsamen Leidenschaft für Präzision, steht unser Atelier in Tuttlingen für Tattoo-Kunst auf höchstem handwerklichen Niveau.",
+    "text2": "Bei uns entsteht jedes Tattoo in enger Zusammenarbeit mit dir: von der ersten Idee über die Skizze bis zum fertigen Werk. Wir nehmen uns die Zeit, deine Vision wirklich zu verstehen – damit das Ergebnis nicht nur ein Tattoo ist, sondern ein Stück von dir.",
+    "image": "img/slider/slider1.jpeg",
+    "imageAlt": "Blutgesang Tattoo Studio"
+  },
+  "values": {
+    "sectionTitle": "Unsere Werte",
+    "items": [
+      {
+        "heading": "Individualität",
+        "text": "Jedes Tattoo ist ein Unikat – maßgeschneidert für dich und niemanden sonst. Wir nehmen uns die Zeit, deine Vision zu verstehen und in Kunst zu übersetzen."
+      },
+      {
+        "heading": "Qualität",
+        "text": "Wir verwenden ausschließlich hochwertige Farben und sterile Materialien. Präzision und Ausdauer sind keine Optionen – sie sind selbstverständlich."
+      },
+      {
+        "heading": "Hygiene & Sicherheit",
+        "text": "Höchste Hygienestandards sind für uns keine Option, sondern Pflicht. Alle Arbeitsgeräte werden steril gehandhabt, Einwegmaterialien konsequent verwendet."
+      }
+    ]
+  },
+  "studio": {
+    "tag": "Das Studio",
+    "heading": "Unser Atelier in Tuttlingen",
+    "text1": "Mitten in der Innenstadt, in der Schulstraße 3, erwartet dich ein Atelier, das Atmosphäre und Handwerk vereint. Das dunkle, stimmungsvolle Ambiente ist kein Zufall – es ist der Rahmen, in dem außergewöhnliche Tattoo-Kunst entsteht.",
+    "text2": "Terminanfragen beantwortest du am liebsten per Instagram DM oder WhatsApp. Wir nehmen uns Zeit für jede Anfrage – für ein erstes Gespräch über dein Motiv, für Fragen zum Ablauf und für alles, was dir wichtig ist.",
+    "image": "img/slider/slider3.jpeg",
+    "imageAlt": "Blutgesang Tattoo Studio Ambiente"
+  }
+}

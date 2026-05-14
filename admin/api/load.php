@@ -14,11 +14,13 @@ if (empty($_SESSION['authenticated'])) {
 }
 
 $files = [
-    'slider'   => 'slider.json',
-    'misa'     => 'portfolio-misa.json',
-    'jaydem'   => 'portfolio-jaydem.json',
-    'news'     => 'news.json',
-    'artists'  => 'artists.json',
+    'slider'     => 'slider.json',
+    'misa'       => 'portfolio-misa.json',
+    'jaydem'     => 'portfolio-jaydem.json',
+    'news'       => 'news.json',
+    'artists'    => 'artists.json',
+    'ueber-uns'  => 'ueber-uns.json',
+    'impressum'  => 'impressum.json',
 ];
 
 $result = [];

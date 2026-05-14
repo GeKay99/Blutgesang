@@ -23,13 +23,19 @@ async function initSlider() {
     const { slides = [], interval = 5000 } = config;
     if (slides.length === 0) return;
 
-    container.innerHTML = slides
-        .map((s, i) =>
-            `<div class="slide${i === 0 ? ' active' : ''}"
-                  style="background-image:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('${s.src}')"
-                  aria-label="${s.alt || ''}"></div>`
-        )
-        .join('');
+    container.innerHTML = slides.map((s, i) => {
+        const active = i === 0 ? ' active' : '';
+        if (s.type === 'video') {
+            return `<div class="slide${active}">
+                <video autoplay muted loop playsinline>
+                    <source src="${s.src}" type="video/mp4">
+                </video>
+            </div>`;
+        }
+        return `<div class="slide${active}"
+                     style="background-image:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('${s.src}')"
+                     aria-label="${s.alt || ''}"></div>`;
+    }).join('');
 
     if (slides.length <= 1) return;
 

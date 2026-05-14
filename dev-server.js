@@ -134,11 +134,13 @@ async function handleLoad(req, res) {
     if (!requireAuth(req, res)) return;
 
     const files = {
-        slider  : 'slider.json',
-        misa    : 'portfolio-misa.json',
-        jaydem  : 'portfolio-jaydem.json',
-        news    : 'news.json',
-        artists : 'artists.json',
+        slider      : 'slider.json',
+        misa        : 'portfolio-misa.json',
+        jaydem      : 'portfolio-jaydem.json',
+        news        : 'news.json',
+        artists     : 'artists.json',
+        'ueber-uns' : 'ueber-uns.json',
+        impressum   : 'impressum.json',
     };
 
     const data = {};
@@ -208,14 +210,16 @@ function parseMultipart(body, boundary) {
 
 // ── Admin API: upload.php ─────────────────────────────────────────────────────
 const UPLOAD_TARGETS = {
-    misa    : 'img/portfolio/misa/',
-    jaydem  : 'img/portfolio/jaydem/',
-    slider  : 'img/slider/',
-    news    : 'img/news/',
-    artists : 'img/artists/',
+    misa        : 'img/portfolio/misa/',
+    jaydem      : 'img/portfolio/jaydem/',
+    slider      : 'img/slider/',
+    news        : 'img/news/',
+    artists     : 'img/artists/',
+    'ueber-uns' : 'img/ueber-uns/',
 };
 const IMAGE_MIME = new Set(['image/jpeg','image/png','image/gif','image/webp','image/avif']);
-const MIME_EXT   = { 'image/jpeg':'jpg','image/png':'png','image/gif':'gif','image/webp':'webp','image/avif':'avif' };
+const VIDEO_MIME = new Set(['video/mp4','video/webm','video/ogg']);
+const MIME_EXT   = { 'image/jpeg':'jpg','image/png':'png','image/gif':'gif','image/webp':'webp','image/avif':'avif','video/mp4':'mp4','video/webm':'webm','video/ogg':'ogv' };
 
 async function handleUpload(req, res) {
     if (!requireAuth(req, res)) return;
@@ -233,7 +237,8 @@ async function handleUpload(req, res) {
 
     if (!UPLOAD_TARGETS[target]) return sendJson(res, 400, { ok: false, error: 'Ungültiges Upload-Ziel' });
     if (!filePart || !filePart.data) return sendJson(res, 400, { ok: false, error: 'Keine Datei empfangen' });
-    if (!IMAGE_MIME.has(filePart.contentType)) return sendJson(res, 400, { ok: false, error: 'Nur Bilder erlaubt' });
+    const isVideo = VIDEO_MIME.has(filePart.contentType) && target === 'slider';
+    if (!IMAGE_MIME.has(filePart.contentType) && !isVideo) return sendJson(res, 400, { ok: false, error: 'Nur Bilder erlaubt; für Slider auch MP4, WebM' });
 
     const ext      = MIME_EXT[filePart.contentType] || 'jpg';
     const baseName = path.basename(filePart.filename, path.extname(filePart.filename));
@@ -263,7 +268,7 @@ async function handleDelete(req, res) {
     const body = await readBody(req);
     const src  = body.src || '';
 
-    if (!/^img\/(portfolio\/[a-z0-9_-]+|slider|news|artists)\/[^/\\]+\.(jpg|jpeg|png|gif|webp|avif)$/i.test(src))
+    if (!/^img\/(portfolio\/[a-z0-9_-]+|slider|news|artists)\/[^/\\]+\.(jpg|jpeg|png|gif|webp|avif|mp4|webm|ogv)$/i.test(src))
         return sendJson(res, 400, { ok: false, error: 'Ungültiger Dateipfad' });
 
     const fullPath = path.join(ROOT, src);
@@ -281,11 +286,13 @@ async function handleSave(req, res) {
 
     const body    = await readBody(req);
     const allowed = {
-        slider  : 'slider.json',
-        misa    : 'portfolio-misa.json',
-        jaydem  : 'portfolio-jaydem.json',
-        news    : 'news.json',
-        artists : 'artists.json',
+        slider      : 'slider.json',
+        misa        : 'portfolio-misa.json',
+        jaydem      : 'portfolio-jaydem.json',
+        news        : 'news.json',
+        artists     : 'artists.json',
+        'ueber-uns' : 'ueber-uns.json',
+        impressum   : 'impressum.json',
     };
 
     if (!allowed[body.key] || body.content == null)

@@ -26,6 +26,14 @@
         document.querySelectorAll('[data-artist-ig="' + key + '"]').forEach(function (el) {
             if (a.instagramDm) el.href = a.instagramDm;
         });
+
+        document.querySelectorAll('[data-artist-bio="' + key + '"]').forEach(function (el) {
+            if (a.bio) el.textContent = a.bio;
+        });
+
+        document.querySelectorAll('[data-artist-bio-detail="' + key + '"]').forEach(function (el) {
+            if (a.bioDetail) el.textContent = a.bioDetail;
+        });
     }
 
     window.applyAllArtists = function () {

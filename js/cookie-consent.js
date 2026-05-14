@@ -26,8 +26,12 @@
         });
     }
 
+    function lockScroll()   { document.documentElement.style.overflow = 'hidden'; }
+    function unlockScroll() { document.documentElement.style.overflow = '';       }
+
     function showBanner() {
         if (document.getElementById('cookie-banner')) return;
+        lockScroll();
         var banner = document.createElement('div');
         banner.id = 'cookie-banner';
         banner.setAttribute('role', 'dialog');
@@ -48,11 +52,13 @@
 
         document.getElementById('cookie-accept-all').addEventListener('click', function () {
             setConsent('all');
+            unlockScroll();
             banner.remove();
             applyConsent(true);
         });
         document.getElementById('cookie-reject').addEventListener('click', function () {
             setConsent('necessary');
+            unlockScroll();
             banner.remove();
             applyConsent(false);
         });

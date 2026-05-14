@@ -1,10 +1,10 @@
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const CONTENT_KEYS = ['slider', 'misa', 'jaydem', 'news', 'artists'];
+const CONTENT_KEYS = ['slider', 'misa', 'jaydem', 'news', 'artists', 'ueber-uns', 'impressum'];
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let state = {
     authenticated: false,
-    data: { slider: null, misa: null, jaydem: null, news: null },
+    data: { slider: null, misa: null, jaydem: null, news: null, 'ueber-uns': null, impressum: null },
     editingPostId: null
 };
 
@@ -67,6 +67,42 @@ document.querySelectorAll('[data-section]').forEach(el => {
         e.preventDefault();
         navigateTo(el.dataset.section);
     });
+});
+
+// ─── MOBILE HAMBURGER ─────────────────────────────────────────────────────────
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const sidebarEl    = document.querySelector('.sidebar');
+const overlayEl    = document.getElementById('sidebar-overlay');
+
+function closeSidebar() {
+    sidebarEl.classList.remove('open');
+    overlayEl.classList.remove('visible');
+    hamburgerBtn.classList.remove('open');
+    hamburgerBtn.setAttribute('aria-label', 'Navigation öffnen');
+}
+
+hamburgerBtn.addEventListener('click', () => {
+    if (sidebarEl.classList.contains('open')) {
+        closeSidebar();
+    } else {
+        sidebarEl.classList.add('open');
+        overlayEl.classList.add('visible');
+        hamburgerBtn.classList.add('open');
+        hamburgerBtn.setAttribute('aria-label', 'Navigation schließen');
+    }
+});
+
+overlayEl.addEventListener('click', closeSidebar);
+
+// Close drawer when a nav item is tapped on mobile
+document.querySelectorAll('[data-section]').forEach(el => {
+    el.addEventListener('click', () => { if (window.innerWidth <= 768) closeSidebar(); });
+});
+
+document.getElementById('mobile-logout-btn').addEventListener('click', async () => {
+    await api('api/auth.php', { action: 'logout' });
+    closeSidebar();
+    showLogin();
 });
 
 // ─── PASSWORD CHANGE ──────────────────────────────────────────────────────────
@@ -144,8 +180,9 @@ function initDropZones() {
     // Slider drop zone — upload + add to slides + auto-save
     initDropZone('drop-slider', 'slider', 'status-slider', (res) => {
         if (!state.data.slider) state.data.slider = { slides: [], interval: 5000 };
-        const alt = res.filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
-        state.data.slider.slides.push({ src: res.src, alt });
+        const alt  = res.filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+        const type = /\.(mp4|webm|ogv)$/i.test(res.src) ? 'video' : 'image';
+        state.data.slider.slides.push({ src: res.src, alt, type });
         renderSlider();
         saveSection('slider', 'slider-save-alert');
     });
@@ -172,6 +209,23 @@ function initDropZones() {
         const img = document.getElementById('preview-artist-jaydem');
         if (img) { img.src = '../' + res.src; img.style.display = ''; }
         saveSection('artists', 'artists-save-alert');
+    }, true);
+
+    // Über-uns image drop zones
+    initDropZone('drop-uu-story', 'ueber-uns', 'status-uu-story', (res) => {
+        ensureUU();
+        state.data['ueber-uns'].story.image = res.src;
+        const img = document.getElementById('preview-uu-story');
+        if (img) { img.src = '../' + res.src; img.style.display = ''; }
+        saveSection('ueber-uns', 'ueber-uns-save-alert');
+    }, true);
+
+    initDropZone('drop-uu-studio', 'ueber-uns', 'status-uu-studio', (res) => {
+        ensureUU();
+        state.data['ueber-uns'].studio.image = res.src;
+        const img = document.getElementById('preview-uu-studio');
+        if (img) { img.src = '../' + res.src; img.style.display = ''; }
+        saveSection('ueber-uns', 'ueber-uns-save-alert');
     }, true);
 }
 
@@ -204,13 +258,13 @@ function initDropZone(zoneId, target, statusId, onSuccess, single = false) {
 }
 
 async function processFiles(files, target, statusEl, onSuccess, single) {
-    const images = files.filter(f => f.type.startsWith('image/'));
-    if (images.length === 0) {
-        setStatus(statusEl, 'Nur Bilddateien erlaubt.', 'err');
+    const media = files.filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
+    if (media.length === 0) {
+        setStatus(statusEl, 'Nur Bild- oder Videodateien erlaubt.', 'err');
         return;
     }
 
-    const toUpload = single ? [images[0]] : images;
+    const toUpload = single ? [media[0]] : media;
 
     for (let i = 0; i < toUpload.length; i++) {
         const file = toUpload[i];
@@ -250,6 +304,8 @@ async function loadAllData() {
     renderPortfolio('jaydem');
     renderNewsList();
     renderArtists();
+    renderUeberUns();
+    renderImpressum();
 }
 
 // ─── SAVE TO SERVER ───────────────────────────────────────────────────────────
@@ -289,29 +345,23 @@ function renderSlider() {
         return;
     }
 
-    list.innerHTML = slides.map((s, i) => `
+    list.innerHTML = slides.map((s, i) => {
+        const thumb = s.type === 'video'
+            ? `<span class="item-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--bg-light-dark);font-size:1.4rem">▶</span>`
+            : `<img class="item-thumb" src="../${s.src}" alt="${s.alt}" onerror="this.style.display='none'">`;
+        return `
         <li class="item-list-entry">
-            <img class="item-thumb" src="../${s.src}" alt="${s.alt}" onerror="this.style.display='none'">
+            ${thumb}
             <span class="item-label">${s.src}</span>
             <div class="item-actions">
                 ${i > 0 ? `<button class="btn btn-secondary btn-sm" onclick="moveSlide(${i},-1)">↑</button>` : ''}
                 ${i < slides.length - 1 ? `<button class="btn btn-secondary btn-sm" onclick="moveSlide(${i},1)">↓</button>` : ''}
                 <button class="btn btn-danger btn-sm" onclick="removeSlide(${i})">×</button>
             </div>
-        </li>`).join('');
+        </li>`;
+    }).join('');
 }
 
-document.getElementById('add-slide-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const src = document.getElementById('slide-src').value.trim();
-    const alt = document.getElementById('slide-alt').value.trim();
-    if (!src) return;
-    if (!state.data.slider) state.data.slider = { slides: [], interval: 5000 };
-    state.data.slider.slides.push({ src, alt });
-    document.getElementById('slide-src').value = '';
-    document.getElementById('slide-alt').value = '';
-    renderSlider();
-});
 
 function moveSlide(i, dir) {
     const slides = state.data.slider.slides;
@@ -409,13 +459,17 @@ function renderArtists() {
         if (el && src) { el.src = '../' + src; el.style.display = ''; }
     };
 
-    setField('artist-misa-spec',   misa.specializedIn);
-    setField('artist-misa-ig-dm',  misa.instagramDm);
-    setImg  ('preview-artist-misa', misa.image);
+    setField('artist-misa-spec',       misa.specializedIn);
+    setField('artist-misa-bio',        misa.bio);
+    setField('artist-misa-bio-detail', misa.bioDetail);
+    setField('artist-misa-ig-dm',      misa.instagramDm);
+    setImg  ('preview-artist-misa',    misa.image);
 
-    setField('artist-jaydem-spec',   jaydem.specializedIn);
-    setField('artist-jaydem-ig-dm',  jaydem.instagramDm);
-    setImg  ('preview-artist-jaydem', jaydem.image);
+    setField('artist-jaydem-spec',       jaydem.specializedIn);
+    setField('artist-jaydem-bio',        jaydem.bio);
+    setField('artist-jaydem-bio-detail', jaydem.bioDetail);
+    setField('artist-jaydem-ig-dm',      jaydem.instagramDm);
+    setImg  ('preview-artist-jaydem',    jaydem.image);
 }
 
 function collectArtistFields() {
@@ -426,10 +480,14 @@ function collectArtistFields() {
     if (!a.misa)   a.misa   = {};
     if (!a.jaydem) a.jaydem = {};
 
-    a.misa.specializedIn  = read('artist-misa-spec')   || a.misa.specializedIn;
-    a.misa.instagramDm    = read('artist-misa-ig-dm')  || a.misa.instagramDm;
-    a.jaydem.specializedIn = read('artist-jaydem-spec') || a.jaydem.specializedIn;
-    a.jaydem.instagramDm   = read('artist-jaydem-ig-dm')|| a.jaydem.instagramDm;
+    a.misa.specializedIn  = read('artist-misa-spec')        || a.misa.specializedIn;
+    a.misa.bio            = read('artist-misa-bio')         || a.misa.bio;
+    a.misa.bioDetail      = read('artist-misa-bio-detail')  || a.misa.bioDetail;
+    a.misa.instagramDm    = read('artist-misa-ig-dm')       || a.misa.instagramDm;
+    a.jaydem.specializedIn = read('artist-jaydem-spec')       || a.jaydem.specializedIn;
+    a.jaydem.bio           = read('artist-jaydem-bio')        || a.jaydem.bio;
+    a.jaydem.bioDetail     = read('artist-jaydem-bio-detail') || a.jaydem.bioDetail;
+    a.jaydem.instagramDm   = read('artist-jaydem-ig-dm')      || a.jaydem.instagramDm;
 }
 
 document.getElementById('save-artists-btn').addEventListener('click', () => {
@@ -567,6 +625,111 @@ document.querySelectorAll('[data-export]').forEach(btn => {
         a.click();
         URL.revokeObjectURL(a.href);
     });
+});
+
+// ─── ÜBER UNS MANAGER ─────────────────────────────────────────────────────────
+function ensureUU() {
+    if (!state.data['ueber-uns']) state.data['ueber-uns'] = {};
+    const d = state.data['ueber-uns'];
+    if (!d.hero)   d.hero   = {};
+    if (!d.story)  d.story  = {};
+    if (!d.values) d.values = { items: [] };
+    if (!d.studio) d.studio = {};
+}
+
+function renderUeberUns() {
+    const d      = state.data['ueber-uns'] || {};
+    const hero   = d.hero   || {};
+    const story  = d.story  || {};
+    const values = d.values || {};
+    const studio = d.studio || {};
+
+    const setF = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+    const setImg = (id, src) => {
+        const el = document.getElementById(id);
+        if (el && src) { el.src = '../' + src; el.style.display = ''; }
+    };
+
+    setF('uu-hero-subtitle', hero.subtitle);
+
+    setF('uu-story-tag',     story.tag);
+    setF('uu-story-heading', story.heading);
+    setF('uu-story-text1',   story.text1);
+    setF('uu-story-text2',   story.text2);
+    setImg('preview-uu-story', story.image);
+
+    setF('uu-values-title', values.sectionTitle);
+    (values.items || []).forEach((item, i) => {
+        setF('uu-value-' + i + '-heading', item.heading);
+        setF('uu-value-' + i + '-text',    item.text);
+    });
+
+    setF('uu-studio-tag',     studio.tag);
+    setF('uu-studio-heading', studio.heading);
+    setF('uu-studio-text1',   studio.text1);
+    setF('uu-studio-text2',   studio.text2);
+    setImg('preview-uu-studio', studio.image);
+}
+
+function collectUeberUnsFields() {
+    const read = id => (document.getElementById(id)?.value || '').trim();
+    ensureUU();
+    const d = state.data['ueber-uns'];
+
+    d.hero.subtitle    = read('uu-hero-subtitle')  || d.hero.subtitle;
+
+    d.story.tag        = read('uu-story-tag')      || d.story.tag;
+    d.story.heading    = read('uu-story-heading')  || d.story.heading;
+    d.story.text1      = read('uu-story-text1')    || d.story.text1;
+    d.story.text2      = read('uu-story-text2')    || d.story.text2;
+
+    d.values.sectionTitle = read('uu-values-title') || d.values.sectionTitle;
+    [0, 1, 2].forEach(i => {
+        if (!d.values.items[i]) d.values.items[i] = {};
+        d.values.items[i].heading = read('uu-value-' + i + '-heading') || d.values.items[i].heading;
+        d.values.items[i].text    = read('uu-value-' + i + '-text')    || d.values.items[i].text;
+    });
+
+    d.studio.tag        = read('uu-studio-tag')     || d.studio.tag;
+    d.studio.heading    = read('uu-studio-heading') || d.studio.heading;
+    d.studio.text1      = read('uu-studio-text1')   || d.studio.text1;
+    d.studio.text2      = read('uu-studio-text2')   || d.studio.text2;
+}
+
+document.getElementById('save-ueber-uns-btn').addEventListener('click', () => {
+    collectUeberUnsFields();
+    saveSection('ueber-uns', 'ueber-uns-save-alert');
+});
+
+// ─── IMPRESSUM MANAGER ────────────────────────────────────────────────────────
+const IMP_BLOCK_IDS = [
+    'angaben', 'kontakt', 'ust', 'berufsbezeichnung', 'verantwortlich',
+    'eu-streit', 'verbraucher-schlicht', 'haftung-inhalte', 'haftung-links', 'urheberrecht'
+];
+
+function renderImpressum() {
+    const d = state.data.impressum || { blocks: [] };
+    (d.blocks || []).forEach(block => {
+        const headEl = document.getElementById('imp-' + block.id + '-heading');
+        const contEl = document.getElementById('imp-' + block.id + '-content');
+        if (headEl && block.heading != null) headEl.value = block.heading;
+        if (contEl && block.content != null) contEl.value = block.content;
+    });
+}
+
+function collectImpressumFields() {
+    const read = id => document.getElementById(id)?.value ?? '';
+    if (!state.data.impressum) state.data.impressum = { blocks: [] };
+    state.data.impressum.blocks = IMP_BLOCK_IDS.map(id => ({
+        id,
+        heading: read('imp-' + id + '-heading'),
+        content: read('imp-' + id + '-content'),
+    }));
+}
+
+document.getElementById('save-impressum-btn').addEventListener('click', () => {
+    collectImpressumFields();
+    saveSection('impressum', 'impressum-save-alert');
 });
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────

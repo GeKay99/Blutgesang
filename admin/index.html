@@ -29,6 +29,20 @@
 <!-- ── ADMIN LAYOUT ─────────────────────────────────────────────────────── -->
 <div id="admin-layout" class="admin-layout" style="display:none">
 
+    <!-- Mobile header (hidden on desktop) -->
+    <header class="mobile-header">
+        <button class="hamburger" id="hamburger-btn" aria-label="Navigation öffnen">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <span class="mobile-header-title">Blutgesang CMS</span>
+        <button id="mobile-logout-btn" class="mobile-logout">Abmelden</button>
+    </header>
+
+    <!-- Dimmed overlay behind open sidebar -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-logo">
@@ -79,6 +93,26 @@
                         <path d="M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h4"/>
                     </svg>
                     News
+                </a>
+            </li>
+            <li>
+                <a href="#" data-section="ueber-uns">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    Über uns
+                </a>
+            </li>
+            <li>
+                <a href="#" data-section="impressum">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    Impressum
                 </a>
             </li>
             <li>
@@ -148,18 +182,7 @@
                 <div class="upload-status" id="status-slider"></div>
             </div>
 
-            <h3 style="margin: 8px 0 16px; font-weight:400; color: var(--text-muted); font-size:0.85rem">Oder Pfad manuell eingeben:</h3>
-            <form id="add-slide-form" style="max-width:500px">
-                <div class="form-group">
-                    <label>Pfad (relativ zur Website, z.B. img/slider/neu.jpeg)</label>
-                    <input type="text" id="slide-src" placeholder="img/slider/slider7.jpeg" required>
-                </div>
-                <div class="form-group">
-                    <label>Alt-Text</label>
-                    <input type="text" id="slide-alt" placeholder="Beschreibung des Bildes">
-                </div>
-                <button type="submit" class="btn btn-secondary">Hinzufügen</button>
-            </form>
+
 
             <div class="btn-group">
                 <button id="save-slider-btn" class="btn btn-primary">Speichern</button>
@@ -251,6 +274,14 @@
                     <input type="text" id="artist-misa-spec" placeholder="z.B. Fineline & Blackwork">
                 </div>
                 <div class="form-group">
+                    <label>Kurztext auf der Artists-Übersichtsseite</label>
+                    <textarea id="artist-misa-bio" rows="3" placeholder="Kurze Beschreibung für die Übersichtsseite (artists.html)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Detailtext auf der Portfolio-Seite</label>
+                    <textarea id="artist-misa-bio-detail" rows="4" placeholder="Ausführlichere Beschreibung für die individuelle Portfolio-Seite (artist-misa.html)"></textarea>
+                </div>
+                <div class="form-group">
                     <label>Instagram DM-Link</label>
                     <input type="url" id="artist-misa-ig-dm" placeholder="https://ig.me/m/benutzername">
                 </div>
@@ -276,6 +307,14 @@
                 <div class="form-group">
                     <label>Spezialisierung (erscheint auf der Artist-Seite)</label>
                     <input type="text" id="artist-jaydem-spec" placeholder="z.B. Realistic & Dark Art">
+                </div>
+                <div class="form-group">
+                    <label>Kurztext auf der Artists-Übersichtsseite</label>
+                    <textarea id="artist-jaydem-bio" rows="3" placeholder="Kurze Beschreibung für die Übersichtsseite (artists.html)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Detailtext auf der Portfolio-Seite</label>
+                    <textarea id="artist-jaydem-bio-detail" rows="4" placeholder="Ausführlichere Beschreibung für die individuelle Portfolio-Seite (artist-jaydem.html)"></textarea>
                 </div>
                 <div class="form-group">
                     <label>Instagram DM-Link</label>
@@ -352,6 +391,215 @@
             <div class="btn-group" style="margin-top:32px; padding-top:24px; border-top:1px solid var(--border)">
                 <button id="save-news-btn" class="btn btn-primary">Alle Änderungen speichern</button>
                 <button class="btn btn-secondary" data-export="news">JSON herunterladen</button>
+            </div>
+        </section>
+
+        <!-- ── ÜBER UNS ───────────────────────────────────────────────── -->
+        <section id="section-ueber-uns" class="admin-section">
+            <div class="section-header">
+                <h1>Über uns</h1>
+                <p>Texte und Bilder der Über-uns-Seite bearbeiten</p>
+            </div>
+            <div id="ueber-uns-save-alert" class="alert" style="display:none"></div>
+
+            <div style="max-width:720px">
+
+                <!-- Hero -->
+                <h3 class="form-section-heading">Seiten-Intro</h3>
+                <div class="form-group">
+                    <label>Untertitel (unter dem Seitentitel "Über uns")</label>
+                    <input type="text" id="uu-hero-subtitle" placeholder="Zwei Künstler. Eine Vision...">
+                </div>
+
+                <!-- Geschichte -->
+                <h3 class="form-section-heading">Geschichte</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Label (klein, über der Überschrift)</label>
+                        <input type="text" id="uu-story-tag" placeholder="Unsere Geschichte">
+                    </div>
+                    <div class="form-group">
+                        <label>Überschrift</label>
+                        <input type="text" id="uu-story-heading" placeholder="Aus Leidenschaft geboren">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Absatz 1</label>
+                    <textarea id="uu-story-text1" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Absatz 2</label>
+                    <textarea id="uu-story-text2" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Bild (rechts neben dem Text)</label>
+                    <div style="display:flex;gap:16px;align-items:center;margin-bottom:12px">
+                        <img id="preview-uu-story" src="../img/slider/slider1.jpeg" alt="Story Bild"
+                             style="width:120px;height:80px;object-fit:cover;border:1px solid var(--border);"
+                             onerror="this.style.display='none'">
+                        <span style="color:var(--text-muted);font-size:0.8rem">Aktuelles Bild</span>
+                    </div>
+                    <div class="drop-zone drop-zone-sm" id="drop-uu-story">
+                        <input type="file" accept="image/*" hidden id="file-uu-story">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                        <p>Neues Bild hochladen (ersetzt aktuelles)</p>
+                        <div class="upload-status" id="status-uu-story"></div>
+                    </div>
+                </div>
+
+                <!-- Werte -->
+                <h3 class="form-section-heading">Unsere Werte</h3>
+                <div class="form-group">
+                    <label>Abschnittstitel</label>
+                    <input type="text" id="uu-values-title" placeholder="Unsere Werte">
+                </div>
+                <div style="border:1px solid var(--border);padding:16px;margin-bottom:12px">
+                    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px">Wert 1</div>
+                    <div class="form-group"><label>Überschrift</label><input type="text" id="uu-value-0-heading" placeholder="Individualität"></div>
+                    <div class="form-group" style="margin-bottom:0"><label>Beschreibung</label><textarea id="uu-value-0-text" rows="3"></textarea></div>
+                </div>
+                <div style="border:1px solid var(--border);padding:16px;margin-bottom:12px">
+                    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px">Wert 2</div>
+                    <div class="form-group"><label>Überschrift</label><input type="text" id="uu-value-1-heading" placeholder="Qualität"></div>
+                    <div class="form-group" style="margin-bottom:0"><label>Beschreibung</label><textarea id="uu-value-1-text" rows="3"></textarea></div>
+                </div>
+                <div style="border:1px solid var(--border);padding:16px;margin-bottom:12px">
+                    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px">Wert 3</div>
+                    <div class="form-group"><label>Überschrift</label><input type="text" id="uu-value-2-heading" placeholder="Hygiene &amp; Sicherheit"></div>
+                    <div class="form-group" style="margin-bottom:0"><label>Beschreibung</label><textarea id="uu-value-2-text" rows="3"></textarea></div>
+                </div>
+
+                <!-- Studio -->
+                <h3 class="form-section-heading">Das Studio</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Label (klein, über der Überschrift)</label>
+                        <input type="text" id="uu-studio-tag" placeholder="Das Studio">
+                    </div>
+                    <div class="form-group">
+                        <label>Überschrift</label>
+                        <input type="text" id="uu-studio-heading" placeholder="Unser Atelier in Tuttlingen">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Absatz 1</label>
+                    <textarea id="uu-studio-text1" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Absatz 2</label>
+                    <textarea id="uu-studio-text2" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Bild (rechts neben dem Text)</label>
+                    <div style="display:flex;gap:16px;align-items:center;margin-bottom:12px">
+                        <img id="preview-uu-studio" src="../img/slider/slider3.jpeg" alt="Studio Bild"
+                             style="width:120px;height:80px;object-fit:cover;border:1px solid var(--border);"
+                             onerror="this.style.display='none'">
+                        <span style="color:var(--text-muted);font-size:0.8rem">Aktuelles Bild</span>
+                    </div>
+                    <div class="drop-zone drop-zone-sm" id="drop-uu-studio">
+                        <input type="file" accept="image/*" hidden id="file-uu-studio">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                        <p>Neues Bild hochladen (ersetzt aktuelles)</p>
+                        <div class="upload-status" id="status-uu-studio"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="btn-group">
+                <button id="save-ueber-uns-btn" class="btn btn-primary">Speichern</button>
+            </div>
+        </section>
+
+        <!-- ── IMPRESSUM ───────────────────────────────────────────────── -->
+        <section id="section-impressum" class="admin-section">
+            <div class="section-header">
+                <h1>Impressum</h1>
+                <p>Rechtliche Angaben der Impressum-Seite bearbeiten</p>
+            </div>
+            <div id="impressum-save-alert" class="alert" style="display:none"></div>
+
+            <div class="alert alert-info" style="max-width:720px;margin-bottom:20px">
+                <strong>Hinweis:</strong> Die Inhaltsfelder unterstützen HTML-Tags wie
+                <code>&lt;br&gt;</code>, <code>&lt;p&gt;</code> und <code>&lt;a href="..."&gt;</code>.
+            </div>
+
+            <div class="content-accordion" style="max-width:720px">
+                <details>
+                    <summary>Angaben gemäß § 5 TMG</summary>
+                    <div class="accordion-body">
+                        <div class="form-group"><label>Überschrift</label><input type="text" id="imp-angaben-heading"></div>
+                        <div class="form-group" style="margin-bottom:0"><label>Inhalt (HTML erlaubt)</label><textarea id="imp-angaben-content" rows="6"></textarea></div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Kontakt</summary>
+                    <div class="accordion-body">
+                        <div class="form-group"><label>Überschrift</label><input type="text" id="imp-kontakt-heading"></div>
+                        <div class="form-group" style="margin-bottom:0"><label>Inhalt (HTML erlaubt)</label><textarea id="imp-kontakt-content" rows="5"></textarea></div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Umsatzsteuer-Identifikationsnummer</summary>
+                    <div class="accordion-body">
+                        <div class="form-group"><label>Überschrift</label><input type="text" id="imp-ust-heading"></div>
+                        <div class="form-group" style="margin-bottom:0"><label>Inhalt (HTML erlaubt)</label><textarea id="imp-ust-content" rows="4"></textarea></div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Berufsbezeichnung</summary>
+                    <div class="accordion-body">
+                        <div class="form-group"><label>Überschrift</label><input type="text" id="imp-berufsbezeichnung-heading"></div>
+                        <div class="form-group" style="margin-bottom:0"><label>Inhalt (HTML erlaubt)</label><textarea id="imp-berufsbezeichnung-content" rows="5"></textarea></div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Verantwortlich nach § 18 Abs. 2 MStV</summary>
+                    <div class="accordion-body">
+                        <div class="form-group"><label>Überschrift</label><input type="text" id="imp-verantwortlich-heading"></div>
+                        <div class="form-group" style="margin-bottom:0"><label>Inhalt (HTML erlaubt)</label><textarea id="imp-verantwortlich-content" rows="5"></textarea></div>
+                    </div>
+                </details>
+                <details>
+                    <summary>EU-Streitschlichtung</summary>
+                    <div class="accordion-body">
+                        <div class="form-group"><label>Überschrift</label><input type="text" id="imp-eu-streit-heading"></div>
+                        <div class="form-group" style="margin-bottom:0"><label>Inhalt (HTML erlaubt)</label><textarea id="imp-eu-streit-content" rows="5"></textarea></div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Verbraucherstreitbeilegung</summary>
+                    <div class="accordion-body">
+                        <div class="form-group"><label>Überschrift</label><input type="text" id="imp-verbraucher-schlicht-heading"></div>
+                        <div class="form-group" style="margin-bottom:0"><label>Inhalt (HTML erlaubt)</label><textarea id="imp-verbraucher-schlicht-content" rows="4"></textarea></div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Haftung für Inhalte</summary>
+                    <div class="accordion-body">
+                        <div class="form-group"><label>Überschrift</label><input type="text" id="imp-haftung-inhalte-heading"></div>
+                        <div class="form-group" style="margin-bottom:0"><label>Inhalt (HTML erlaubt)</label><textarea id="imp-haftung-inhalte-content" rows="7"></textarea></div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Haftung für Links</summary>
+                    <div class="accordion-body">
+                        <div class="form-group"><label>Überschrift</label><input type="text" id="imp-haftung-links-heading"></div>
+                        <div class="form-group" style="margin-bottom:0"><label>Inhalt (HTML erlaubt)</label><textarea id="imp-haftung-links-content" rows="4"></textarea></div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Urheberrecht</summary>
+                    <div class="accordion-body">
+                        <div class="form-group"><label>Überschrift</label><input type="text" id="imp-urheberrecht-heading"></div>
+                        <div class="form-group" style="margin-bottom:0"><label>Inhalt (HTML erlaubt)</label><textarea id="imp-urheberrecht-content" rows="5"></textarea></div>
+                    </div>
+                </details>
+            </div>
+
+            <div class="btn-group" style="max-width:720px">
+                <button id="save-impressum-btn" class="btn btn-primary">Speichern</button>
             </div>
         </section>
 

@@ -1,28 +1,6 @@
 {
   "posts": [
     {
-      "id": "get-ist-ein-geiler-typ-1778759988704",
-      "title": "Get ist ein geiler Typ",
-      "slug": "get-ist-ein-geiler-typ-1778759988704",
-      "date": "2026-05-14",
-      "excerpt": "Get ist ein geiler typ",
-      "content": "Get ist ein geiler typ",
-      "image": "img/news/Bewerbungsbild.jpg",
-      "tags": [],
-      "published": true
-    },
-    {
-      "id": "das-ist-ein-test-beitrag-1778757679843",
-      "title": "Das ist ein test beitrag",
-      "slug": "das-ist-ein-test-beitrag-1778757679843",
-      "date": "2026-05-14",
-      "excerpt": "Das ist ein Test",
-      "content": "Halli hallöchen",
-      "image": "img/news/WhatsApp-Image-2026-05-11-at-14-25-50.jpg",
-      "tags": [],
-      "published": true
-    },
-    {
       "id": "willkommen-2026",
       "title": "Willkommen bei Blutgesang Tattoo",
       "slug": "willkommen-2026",

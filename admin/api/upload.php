@@ -16,11 +16,12 @@ if (empty($_SESSION['authenticated'])) {
 $target = $_POST['target'] ?? '';
 
 $targets = [
-    'misa'    => 'img/portfolio/misa/',
-    'jaydem'  => 'img/portfolio/jaydem/',
-    'slider'  => 'img/slider/',
-    'news'    => 'img/news/',
-    'artists' => 'img/artists/',
+    'misa'      => 'img/portfolio/misa/',
+    'jaydem'    => 'img/portfolio/jaydem/',
+    'slider'    => 'img/slider/',
+    'news'      => 'img/news/',
+    'artists'   => 'img/artists/',
+    'ueber-uns' => 'img/ueber-uns/',
 ];
 
 if (!array_key_exists($target, $targets)) {
@@ -53,12 +54,22 @@ $mimeMap  = [
     'image/webp' => 'webp',
     'image/avif' => 'avif',
 ];
+$videoMimeMap = [
+    'video/mp4'  => 'mp4',
+    'video/webm' => 'webm',
+    'video/ogg'  => 'ogv',
+];
 
-if (!array_key_exists($mime, $mimeMap)) {
+$isImage = array_key_exists($mime, $mimeMap);
+$isVideo = $target === 'slider' && array_key_exists($mime, $videoMimeMap);
+
+if (!$isImage && !$isVideo) {
     http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'Nur Bilder erlaubt (JPG, PNG, GIF, WebP, AVIF)']);
+    echo json_encode(['ok' => false, 'error' => 'Nur Bilder erlaubt (JPG, PNG, GIF, WebP, AVIF); für Slider auch MP4, WebM']);
     exit;
 }
+
+$mimeMap = array_merge($mimeMap, $isVideo ? $videoMimeMap : []);
 
 $ext          = $mimeMap[$mime];
 $baseName     = pathinfo($file['name'], PATHINFO_FILENAME);

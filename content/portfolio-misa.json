@@ -1,4 +1,21 @@
 {
   "artist": "Misa",
-  "gallery": []
+  "gallery": [
+    {
+      "src": "img/portfolio/misa/dsadasd.png",
+      "alt": "Misa Tattoo"
+    },
+    {
+      "src": "img/portfolio/misa/jeydem.png",
+      "alt": "Misa Tattoo"
+    },
+    {
+      "src": "img/portfolio/misa/misa.png",
+      "alt": "Misa Tattoo"
+    },
+    {
+      "src": "img/portfolio/misa/Unbenannt.png",
+      "alt": "Misa Tattoo"
+    }
+  ]
 }

@@ -18,7 +18,7 @@ $data = json_decode($raw, true);
 $src  = $data['src'] ?? '';
 
 // Only allow image files within managed folders — no path traversal
-if (!preg_match('/^img\/(portfolio\/[a-z0-9_-]+|slider|news|artists)\/[^\/\\\\]+\.(jpg|jpeg|png|gif|webp|avif)$/i', $src)) {
+if (!preg_match('/^img\/(portfolio\/[a-z0-9_-]+|slider|news|artists)\/[^\/\\\\]+\.(jpg|jpeg|png|gif|webp|avif|mp4|webm|ogv)$/i', $src)) {
     http_response_code(400);
     echo json_encode(['ok' => false, 'error' => 'Ungültiger Dateipfad']);
     exit;

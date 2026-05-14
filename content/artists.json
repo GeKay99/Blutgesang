@@ -2,15 +2,19 @@
   "misa": {
     "name": "Misa Tattoo",
     "specializedIn": "Fineline & Blackwork",
-    "image": "img/artists/Bewerbungsbild.jpg",
+    "image": "img/artists/Unbenannt.png",
     "instagram": "https://www.instagram.com/misa.tattoos/",
-    "instagramDm": "https://ig.me/m/misa.tattoos"
+    "instagramDm": "https://ig.me/m/misa.tattoos",
+    "bio": "Mit einem Auge für das Detail und einer Leidenschaft für feine Linien verwandelt Misa deine Visionen in zeitlose Hautkunst. Spezialisiert auf Fineline und filigranes Blackwork schafft sie Kunstwerke, die Persönlichkeit und Emotion in jeder Linie tragen.",
+    "bioDetail": "Misa steht für Präzision und Ästhetik. Mit jahrelanger Erfahrung in filigranen Fineline-Arbeiten und ausdrucksstarkem Blackwork schafft sie Kunstwerke, die die Persönlichkeit ihrer Kunden perfekt unterstreichen. Jedes Motiv ist ein Unikat – handgezeichnet und mit Leidenschaft gestochen."
   },
   "jaydem": {
     "name": "Jaydem Tattoo",
     "specializedIn": "Realistic & Dark Art",
-    "image": "img/artists/Bewerbungsbild-1.jpg",
+    "image": "img/artists/dsadasd.png",
     "instagram": "https://www.instagram.com/jaydems_tattoo/",
-    "instagramDm": "https://ig.me/m/jaydems_tattoo"
+    "instagramDm": "https://ig.me/m/jaydems_tattoo",
+    "bio": "Jaydem bringt die Dunkelheit ans Licht. Ihre Arbeiten zeichnen sich durch enorme Tiefe, fotorealistische Details und ausdrucksstarke Kontraste aus. Spezialisiert auf Dark Art schafft sie düstere Meisterwerke, die unter die Haut gehen und Geschichten erzählen.",
+    "bioDetail": "Jaydem bringt die Dunkelheit ans Licht. Ihre Arbeiten zeichnen sich durch enorme Tiefe, fotorealistische Details und ausdrucksstarke Kontraste aus. Spezialisiert auf Dark Art schafft sie düstere Meisterwerke, die unter die Haut gehen und Geschichten erzählen."
   }
 }
