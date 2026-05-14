@@ -134,8 +134,8 @@
         .artist-info h3 { font-family: 'Cinzel', serif; font-size: 1.8rem; margin-bottom: 10px; }
         .artist-info span { color: var(--accent-red); text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; }
 
-        /* --- STICKY WHATSAPP SELECTOR --- */
-        .wa-sticky {
+        /* --- STICKY INSTAGRAM BUTTON --- */
+        .ig-sticky {
             position: fixed;
             bottom: 30px;
             right: 30px;
@@ -145,7 +145,7 @@
             align-items: flex-end;
         }
 
-        .wa-options {
+        .ig-options {
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -156,39 +156,43 @@
             transition: 0.3s all ease;
         }
 
-        .wa-sticky:hover .wa-options {
+        .ig-sticky:hover .ig-options,
+        .ig-sticky.active .ig-options {
             transform: translateY(0);
             opacity: 1;
             pointer-events: auto;
         }
 
-        .wa-btn {
-            background: var(--whatsapp-green);
+        .ig-btn {
+            background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
             color: white;
             text-decoration: none;
             padding: 12px 20px;
             border-radius: 50px;
             font-size: 0.9rem;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             white-space: nowrap;
             transition: 0.3s;
         }
 
-        .wa-btn:hover { transform: scale(1.05); background: #1eb954; }
+        .ig-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
 
-        .wa-main-trigger {
+        .ig-main-trigger {
             width: 60px; height: 60px;
-            background: var(--whatsapp-green);
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            border: none;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
         }
 
-        .wa-main-trigger svg { width: 30px; fill: white; }
+        .ig-main-trigger:hover { transform: scale(1.1); }
+        .ig-main-trigger svg { width: 28px; fill: white; }
 
         /* --- MOBILE ADAPTATION --- */
         @media (max-width: 900px) {
@@ -602,6 +606,26 @@
 
 .wa-btn-secondary:hover {
     color: var(--accent-red);
+}
+
+.ig-btn-secondary {
+    text-decoration: none;
+    color: var(--white);
+    border-bottom: 1px solid #e1306c;
+    padding: 5px 0;
+    font-size: 0.9rem;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ig-btn-secondary:hover {
+    color: #e1306c;
+}
+
+.ig-btn-secondary svg {
+    flex-shrink: 0;
 }
 
 /* --- RESPONSIVE ADJUSTMENTS --- */
@@ -1365,4 +1389,316 @@
 
     .about-story-visual img,
     .about-studio-map img { max-width: 100%; }
+}
+
+/* ─── Cookie Consent Banner ─────────────────────────────────────────────────── */
+@keyframes cookieSlideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+#cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: rgba(8, 8, 8, 0.97);
+    border-top: 1px solid #2a2a2a;
+    padding: 20px 24px;
+    backdrop-filter: blur(4px);
+    animation: cookieSlideUp 0.3s ease;
+}
+
+.cookie-banner-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.cookie-text {
+    flex: 1;
+    min-width: 240px;
+}
+
+.cookie-text strong {
+    display: block;
+    color: var(--accent-gold);
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.cookie-text p {
+    font-size: 0.82rem;
+    color: #999;
+    margin: 0;
+    line-height: 1.65;
+}
+
+.cookie-text a {
+    color: var(--accent-gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.cookie-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.cookie-btn {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: opacity 0.2s, background 0.2s, color 0.2s;
+}
+
+.cookie-btn:hover { opacity: 0.85; }
+
+.cookie-btn-accept {
+    background: var(--accent-gold);
+    color: #a71919;
+}
+
+.cookie-btn-reject {
+    background: transparent;
+    color: #bbb;
+    border: 1px solid #444;
+}
+
+@media (max-width: 600px) {
+    #cookie-banner {
+        padding: 16px 16px max(16px, env(safe-area-inset-bottom, 16px));
+    }
+
+    .cookie-banner-inner {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .cookie-text {
+        min-width: 0;
+    }
+
+    .cookie-text strong {
+        font-size: 0.88rem;
+    }
+
+    .cookie-text p {
+        font-size: 0.79rem;
+        line-height: 1.55;
+    }
+
+    .cookie-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .cookie-btn {
+        width: 100%;
+        text-align: center;
+        min-height: 48px;
+        font-size: 0.8rem;
+        padding: 12px 16px;
+    }
+
+    .cookie-btn-accept {
+        order: -1;
+    }
+}
+
+/* ─── Map Consent Wrapper ────────────────────────────────────────────────────── */
+.map-consent-wrapper {
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+}
+
+.map-consent-wrapper iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    border: none;
+}
+
+.map-blocked {
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #0d0d0d;
+    border: 1px solid #222;
+    border-radius: 2px;
+    gap: 10px;
+    text-align: center;
+    padding: 40px 24px;
+}
+
+.map-blocked svg { stroke: #444; margin-bottom: 8px; }
+.map-blocked p { color: #666; font-size: 0.88rem; margin: 0; }
+
+.cookie-revoke-btn {
+    background: transparent;
+    border: 1px solid var(--accent-gold);
+    color: var(--accent-gold);
+    padding: 9px 20px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: background 0.2s, color 0.2s;
+    margin-top: 12px;
+}
+
+.cookie-revoke-btn:hover {
+    background: var(--accent-gold);
+    color: #080808;
+}
+
+/* ─── Lightbox ───────────────────────────────────────────────────────────────── */
+#lb-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.92);
+    align-items: center;
+    justify-content: center;
+}
+
+#lb-overlay.lb-open {
+    display: flex;
+}
+
+#lb-inner {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+#lb-img {
+    max-width: 90vw;
+    max-height: 80vh;
+    object-fit: contain;
+    border: 1px solid #333;
+    display: block;
+}
+
+#lb-caption {
+    color: #bbb;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    margin: 0;
+    text-align: center;
+}
+
+#lb-close {
+    position: absolute;
+    top: -44px;
+    right: 0;
+    background: transparent;
+    border: 1px solid #444;
+    color: #ccc;
+    font-size: 1.4rem;
+    line-height: 1;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+#lb-close:hover {
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+}
+
+/* ─── Portfolio Preview Thumbnails (artists overview page) ───────────────────── */
+.portfolio-preview {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.preview-thumb {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    border: 1px solid #222;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.preview-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+}
+
+.preview-thumb img:hover {
+    transform: scale(1.08);
+}
+
+.preview-loading,
+.preview-empty {
+    color: #555;
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    margin: 12px 0 0 0;
+}
+
+@media (max-width: 600px) {
+    .preview-thumb {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+/* ─── Footer Cookie Settings Button ─────────────────────────────────────────── */
+.footer-cookie-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--text-muted);
+    font-family: 'Montserrat', sans-serif;
+    font-size: inherit;
+    cursor: pointer;
+    text-align: left;
+    transition: color 0.2s;
+}
+
+.footer-cookie-btn:hover {
+    color: var(--accent-gold);
 }

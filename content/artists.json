@@ -1,0 +1,16 @@
+{
+  "misa": {
+    "name": "Misa Tattoo",
+    "specializedIn": "Fineline & Blackwork",
+    "image": "img/artists/Bewerbungsbild.jpg",
+    "instagram": "https://www.instagram.com/misa.tattoos/",
+    "instagramDm": "https://ig.me/m/misa.tattoos"
+  },
+  "jaydem": {
+    "name": "Jaydem Tattoo",
+    "specializedIn": "Realistic & Dark Art",
+    "image": "img/artists/Bewerbungsbild-1.jpg",
+    "instagram": "https://www.instagram.com/jaydems_tattoo/",
+    "instagramDm": "https://ig.me/m/jaydems_tattoo"
+  }
+}

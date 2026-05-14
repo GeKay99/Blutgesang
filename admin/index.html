@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CMS | Blutgesang Tattoo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=Montserrat:wght@300;400;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -65,6 +65,15 @@
                 </a>
             </li>
             <li>
+                <a href="#" data-section="artists">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="8" r="4"/>
+                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                    </svg>
+                    Artists
+                </a>
+            </li>
+            <li>
                 <a href="#" data-section="news">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h4"/>
@@ -107,16 +116,17 @@
                     <div class="stat-label">Portfolio Misa</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-num" id="stat-jeydem">–</div>
-                    <div class="stat-label">Portfolio Jeydem</div>
+                    <div class="stat-num" id="stat-jaydem">–</div>
+                    <div class="stat-label">Portfolio Jaydem</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-num" id="stat-posts">–</div>
                     <div class="stat-label">News (veröffentlicht)</div>
                 </div>
             </div>
-            <div class="alert alert-info" style="max-width:600px">
-                <strong>Hinweis:</strong> Änderungen werden direkt in die GitHub-Repository committed und GitHub Pages aktualisiert sich innerhalb weniger Minuten. GitHub-Einstellungen bitte zuerst unter <em>Einstellungen</em> konfigurieren.
+            <div id="dashboard-alert" class="alert" style="display:none"></div>
+            <div class="alert alert-info" style="max-width:600px; margin-top:16px">
+                <strong>Hinweis:</strong> Änderungen werden direkt auf dem Server gespeichert und sind sofort auf der Website sichtbar. Neue Bilder müssen zuerst per FTP oder Dateimanager in den entsprechenden Ordner hochgeladen werden.
             </div>
         </section>
 
@@ -130,7 +140,15 @@
 
             <ul id="slider-list" class="item-list"></ul>
 
-            <h3 style="margin: 28px 0 16px; font-weight:400">Neues Bild hinzufügen</h3>
+            <div class="drop-zone" id="drop-slider" data-target="slider">
+                <input type="file" accept="image/*" multiple hidden id="file-slider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                <p><strong>Bilder hierher ziehen</strong> oder klicken zum Auswählen</p>
+                <p style="margin-top:4px;font-size:0.75rem">JPG, PNG, WebP, AVIF – mehrere Dateien möglich</p>
+                <div class="upload-status" id="status-slider"></div>
+            </div>
+
+            <h3 style="margin: 8px 0 16px; font-weight:400; color: var(--text-muted); font-size:0.85rem">Oder Pfad manuell eingeben:</h3>
             <form id="add-slide-form" style="max-width:500px">
                 <div class="form-group">
                     <label>Pfad (relativ zur Website, z.B. img/slider/neu.jpeg)</label>
@@ -144,7 +162,7 @@
             </form>
 
             <div class="btn-group">
-                <button id="save-slider-btn" class="btn btn-primary">Auf GitHub speichern</button>
+                <button id="save-slider-btn" class="btn btn-primary">Speichern</button>
                 <button class="btn btn-secondary" data-export="slider">JSON herunterladen</button>
             </div>
         </section>
@@ -158,7 +176,7 @@
 
             <div class="tabs">
                 <button class="tab-btn active" data-tab="tab-misa">Misa</button>
-                <button class="tab-btn" data-tab="tab-jeydem">Jeydem</button>
+                <button class="tab-btn" data-tab="tab-jaydem">Jaydem</button>
             </div>
 
             <!-- Misa Tab -->
@@ -166,45 +184,107 @@
                 <div id="misa-save-alert" class="alert" style="display:none"></div>
                 <ul id="portfolio-list-misa" class="item-list"></ul>
 
-                <h3 style="margin: 28px 0 16px; font-weight:400">Bild hinzufügen</h3>
-                <form id="add-misa-form" style="max-width:500px">
-                    <div class="form-group">
-                        <label>Pfad (z.B. img/portfolio/misa/7.png)</label>
-                        <input type="text" id="misa-img-src" placeholder="img/portfolio/misa/7.png" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Alt-Text</label>
-                        <input type="text" id="misa-img-alt" placeholder="Fineline Tattoo von Misa">
-                    </div>
-                    <button type="submit" class="btn btn-secondary">Hinzufügen</button>
-                </form>
+                <div class="drop-zone" id="drop-misa" data-target="misa">
+                    <input type="file" accept="image/*" multiple hidden id="file-misa">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    <p><strong>Bilder hierher ziehen</strong> oder klicken zum Auswählen</p>
+                    <p style="margin-top:4px;font-size:0.75rem">Dateien werden direkt in den Misa-Portfolio-Ordner hochgeladen</p>
+                    <div class="upload-status" id="status-misa"></div>
+                </div>
                 <div class="btn-group">
-                    <button id="save-misa-btn" class="btn btn-primary">Auf GitHub speichern</button>
+                    <button id="save-misa-btn" class="btn btn-primary">Speichern</button>
                     <button class="btn btn-secondary" data-export="misa">JSON herunterladen</button>
                 </div>
             </div>
 
-            <!-- Jeydem Tab -->
-            <div id="tab-jeydem" class="tab-panel">
-                <div id="jeydem-save-alert" class="alert" style="display:none"></div>
-                <ul id="portfolio-list-jeydem" class="item-list"></ul>
+            <!-- Jaydem Tab -->
+            <div id="tab-jaydem" class="tab-panel">
+                <div id="jaydem-save-alert" class="alert" style="display:none"></div>
+                <ul id="portfolio-list-jaydem" class="item-list"></ul>
 
-                <h3 style="margin: 28px 0 16px; font-weight:400">Bild hinzufügen</h3>
-                <form id="add-jeydem-form" style="max-width:500px">
-                    <div class="form-group">
-                        <label>Pfad (z.B. img/portfolio/jeydem/7.png)</label>
-                        <input type="text" id="jeydem-img-src" placeholder="img/portfolio/jeydem/7.png" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Alt-Text</label>
-                        <input type="text" id="jeydem-img-alt" placeholder="Dark Art Tattoo von Jeydem">
-                    </div>
-                    <button type="submit" class="btn btn-secondary">Hinzufügen</button>
-                </form>
-                <div class="btn-group">
-                    <button id="save-jeydem-btn" class="btn btn-primary">Auf GitHub speichern</button>
-                    <button class="btn btn-secondary" data-export="jeydem">JSON herunterladen</button>
+                <div class="drop-zone" id="drop-jaydem" data-target="jaydem">
+                    <input type="file" accept="image/*" multiple hidden id="file-jaydem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    <p><strong>Bilder hierher ziehen</strong> oder klicken zum Auswählen</p>
+                    <p style="margin-top:4px;font-size:0.75rem">Dateien werden direkt in den Jaydem-Portfolio-Ordner hochgeladen</p>
+                    <div class="upload-status" id="status-jaydem"></div>
                 </div>
+                <div class="btn-group">
+                    <button id="save-jaydem-btn" class="btn btn-primary">Speichern</button>
+                    <button class="btn btn-secondary" data-export="jaydem">JSON herunterladen</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── ARTISTS ───────────────────────────────────────────────── -->
+        <section id="section-artists" class="admin-section">
+            <div class="section-header">
+                <h1>Artists</h1>
+                <p>Künstlerprofile bearbeiten – Spezialisierung, Profilbild und Instagram</p>
+            </div>
+            <div id="artists-save-alert" class="alert" style="display:none"></div>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="tab-artist-misa">Misa</button>
+                <button class="tab-btn" data-tab="tab-artist-jaydem">Jaydem</button>
+            </div>
+
+            <!-- Misa Tab -->
+            <div id="tab-artist-misa" class="tab-panel active" style="max-width:560px">
+                <div class="form-group">
+                    <label>Profilbild</label>
+                    <div style="display:flex;gap:16px;align-items:center;margin-bottom:12px">
+                        <img id="preview-artist-misa" src="../img/artists/misa.png" alt="Misa"
+                             style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);"
+                             onerror="this.style.display='none'">
+                        <span style="color:var(--text-muted);font-size:0.8rem">Aktuelles Bild</span>
+                    </div>
+                    <div class="drop-zone drop-zone-sm" id="drop-artist-misa">
+                        <input type="file" accept="image/*" hidden id="file-artist-misa">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                        <p>Neues Bild hochladen (ersetzt aktuelles)</p>
+                        <div class="upload-status" id="status-artist-misa"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Spezialisierung (erscheint auf der Artist-Seite)</label>
+                    <input type="text" id="artist-misa-spec" placeholder="z.B. Fineline & Blackwork">
+                </div>
+                <div class="form-group">
+                    <label>Instagram DM-Link</label>
+                    <input type="url" id="artist-misa-ig-dm" placeholder="https://ig.me/m/benutzername">
+                </div>
+            </div>
+
+            <!-- Jaydem Tab -->
+            <div id="tab-artist-jaydem" class="tab-panel" style="max-width:560px">
+                <div class="form-group">
+                    <label>Profilbild</label>
+                    <div style="display:flex;gap:16px;align-items:center;margin-bottom:12px">
+                        <img id="preview-artist-jaydem" src="../img/artists/jaydem.png" alt="Jaydem"
+                             style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);"
+                             onerror="this.style.display='none'">
+                        <span style="color:var(--text-muted);font-size:0.8rem">Aktuelles Bild</span>
+                    </div>
+                    <div class="drop-zone drop-zone-sm" id="drop-artist-jaydem">
+                        <input type="file" accept="image/*" hidden id="file-artist-jaydem">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                        <p>Neues Bild hochladen (ersetzt aktuelles)</p>
+                        <div class="upload-status" id="status-artist-jaydem"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Spezialisierung (erscheint auf der Artist-Seite)</label>
+                    <input type="text" id="artist-jaydem-spec" placeholder="z.B. Realistic & Dark Art">
+                </div>
+                <div class="form-group">
+                    <label>Instagram DM-Link</label>
+                    <input type="url" id="artist-jaydem-ig-dm" placeholder="https://ig.me/m/benutzername">
+                </div>
+            </div>
+
+            <div class="btn-group" style="margin-top:8px">
+                <button id="save-artists-btn" class="btn btn-primary">Speichern</button>
             </div>
         </section>
 
@@ -248,8 +328,14 @@
                             <input type="text" id="post-tags" placeholder="Studio, News, Kunst">
                         </div>
                         <div class="form-group">
-                            <label>Titelbild (Pfad)</label>
-                            <input type="text" id="post-image" placeholder="img/news/beitrag.jpg">
+                            <label>Titelbild</label>
+                            <input type="text" id="post-image" placeholder="img/news/beitrag.jpg" style="margin-bottom:8px">
+                            <div class="drop-zone drop-zone-sm" id="drop-news-img" data-target="news">
+                                <input type="file" accept="image/*" hidden id="file-news-img">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                                <p>Bild hochladen (setzt Pfad automatisch)</p>
+                                <div class="upload-status" id="status-news-img"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group" style="display:flex;align-items:center;gap:10px">
@@ -264,7 +350,7 @@
             </div>
 
             <div class="btn-group" style="margin-top:32px; padding-top:24px; border-top:1px solid var(--border)">
-                <button id="save-news-btn" class="btn btn-primary">Alle Änderungen auf GitHub speichern</button>
+                <button id="save-news-btn" class="btn btn-primary">Alle Änderungen speichern</button>
                 <button class="btn btn-secondary" data-export="news">JSON herunterladen</button>
             </div>
         </section>
@@ -273,37 +359,7 @@
         <section id="section-settings" class="admin-section">
             <div class="section-header">
                 <h1>Einstellungen</h1>
-                <p>GitHub-Verbindung und Sicherheit konfigurieren</p>
-            </div>
-
-            <div class="settings-card">
-                <h2>GitHub Repository</h2>
-                <div id="settings-alert" class="alert" style="display:none"></div>
-                <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:20px">
-                    Erstelle ein <strong>Personal Access Token</strong> unter GitHub → Settings → Developer settings → Personal access tokens.
-                    Der Token benötigt den Scope <code>repo</code> (oder <code>contents: write</code> für Fine-grained tokens).
-                </p>
-                <form id="settings-github-form">
-                    <div class="form-group">
-                        <label>Personal Access Token</label>
-                        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>GitHub Benutzername / Organisation</label>
-                            <input type="text" id="gh-owner" placeholder="dein-username">
-                        </div>
-                        <div class="form-group">
-                            <label>Repository-Name</label>
-                            <input type="text" id="gh-repo" placeholder="Blutgesang">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Branch</label>
-                        <input type="text" id="gh-branch" placeholder="main">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Speichern</button>
-                </form>
+                <p>Sicherheit und Zugangsdaten konfigurieren</p>
             </div>
 
             <div class="settings-card">
@@ -311,7 +367,7 @@
                 <div id="pw-alert" class="alert" style="display:none"></div>
                 <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:20px">
                     Standard-Passwort: <code>BlutgesangAdmin</code> – bitte nach dem ersten Login ändern.
-                    Das Passwort wird als SHA-256-Hash im LocalStorage des Browsers gespeichert.
+                    Das neue Passwort wird sicher als Hash auf dem Server gespeichert.
                 </p>
                 <form id="settings-pw-form">
                     <div class="form-group">

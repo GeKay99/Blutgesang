@@ -1,0 +1,8 @@
+# Block direct web access to sensitive config files
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Protect api/ directory so only PHP execution is allowed (no directory listing)
+Options -Indexes

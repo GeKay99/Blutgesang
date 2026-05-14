@@ -1,14 +1,40 @@
 {
   "posts": [
     {
+      "id": "get-ist-ein-geiler-typ-1778759988704",
+      "title": "Get ist ein geiler Typ",
+      "slug": "get-ist-ein-geiler-typ-1778759988704",
+      "date": "2026-05-14",
+      "excerpt": "Get ist ein geiler typ",
+      "content": "Get ist ein geiler typ",
+      "image": "img/news/Bewerbungsbild.jpg",
+      "tags": [],
+      "published": true
+    },
+    {
+      "id": "das-ist-ein-test-beitrag-1778757679843",
+      "title": "Das ist ein test beitrag",
+      "slug": "das-ist-ein-test-beitrag-1778757679843",
+      "date": "2026-05-14",
+      "excerpt": "Das ist ein Test",
+      "content": "Halli hallöchen",
+      "image": "img/news/WhatsApp-Image-2026-05-11-at-14-25-50.jpg",
+      "tags": [],
+      "published": true
+    },
+    {
       "id": "willkommen-2026",
       "title": "Willkommen bei Blutgesang Tattoo",
       "slug": "willkommen-2026",
       "date": "2026-05-01",
       "excerpt": "Wir freuen uns, euch unser Studio in Tuttlingen vorzustellen. Blutgesang Tattoo ist das neue Zuhause für Fineline, Blackwork und Dark Art.",
-      "content": "<p>Wir freuen uns, euch unser Studio in Tuttlingen vorzustellen. Blutgesang Tattoo ist das neue Zuhause für außergewöhnliche Tattoo-Kunst.</p><p>Unser Team besteht aus zwei leidenschaftlichen Künstlern: <strong>Misa</strong> mit ihrer Expertise in Fineline und Blackwork sowie <strong>Jeydem</strong> mit seinem einzigartigen Stil in Realistic und Dark Art.</p><p>Besucht uns in der Schulstraße 3 in Tuttlingen oder schreibt uns direkt per WhatsApp, um euren Wunschtermin anzufragen.</p>",
+      "content": "<p>Wir freuen uns, euch unser Studio in Tuttlingen vorzustellen. Blutgesang Tattoo ist das neue Zuhause für außergewöhnliche Tattoo-Kunst.</p><p>Unser Team besteht aus zwei leidenschaftlichen Künstlern: <strong>Misa</strong> mit ihrer Expertise in Fineline und Blackwork sowie <strong>Jaydem</strong> mit seinem einzigartigen Stil in Realistic und Dark Art.</p><p>Besucht uns in der Schulstraße 3 in Tuttlingen oder schreibt uns direkt per WhatsApp, um euren Wunschtermin anzufragen.</p>",
       "image": "",
-      "tags": ["Studio", "News", "Eröffnung"],
+      "tags": [
+        "Studio",
+        "News",
+        "Eröffnung"
+      ],
       "published": true
     },
     {
@@ -16,10 +42,13 @@
       "title": "Neue Motive im Portfolio",
       "slug": "neue-motive-2026",
       "date": "2026-04-15",
-      "excerpt": "Misa und Jeydem haben ihre Portfolios mit frischen Arbeiten erweitert. Schaut rein und lasst euch inspirieren.",
-      "content": "<p>In den letzten Wochen haben unsere beiden Künstler ihre Portfolios mit beeindruckenden neuen Arbeiten aktualisiert.</p><p><strong>Misa</strong> präsentiert neue Fineline-Motive mit botanischen Elementen und geometrischen Strukturen – zart, präzise und zeitlos elegant.</p><p><strong>Jeydem</strong> zeigt neue Dark Art Werke, die Licht und Schatten meisterhaft einsetzen und tiefgründige Geschichten erzählen.</p><p>Schaut euch die Portfolios an und lasst euch inspirieren!</p>",
+      "excerpt": "Misa und Jaydem haben ihre Portfolios mit frischen Arbeiten erweitert. Schaut rein und lasst euch inspirieren.",
+      "content": "<p>In den letzten Wochen haben unsere beiden Künstler ihre Portfolios mit beeindruckenden neuen Arbeiten aktualisiert.</p><p><strong>Misa</strong> präsentiert neue Fineline-Motive mit botanischen Elementen und geometrischen Strukturen – zart, präzise und zeitlos elegant.</p><p><strong>Jaydem</strong> zeigt neue Dark Art Werke, die Licht und Schatten meisterhaft einsetzen und tiefgründige Geschichten erzählen.</p><p>Schaut euch die Portfolios an und lasst euch inspirieren!</p>",
       "image": "",
-      "tags": ["Portfolio", "Kunst"],
+      "tags": [
+        "Portfolio",
+        "Kunst"
+      ],
       "published": true
     }
   ]

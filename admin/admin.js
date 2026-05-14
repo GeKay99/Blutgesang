@@ -1,30 +1,17 @@
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-// Default password: "BlutgesangAdmin"
-// To change: run sha256("newpassword") in console, update DEFAULT_HASH below.
-const DEFAULT_HASH = 'f31bf4da0acc65f245b2c5c918fe4d4e193305c4198a669b5031508e305601f5';
-
-const CONTENT_FILES = {
-    slider:   'content/slider.json',
-    misa:     'content/portfolio-misa.json',
-    jeydem:   'content/portfolio-jeydem.json',
-    news:     'content/news.json'
-};
+const CONTENT_KEYS = ['slider', 'misa', 'jaydem', 'news', 'artists'];
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let state = {
     authenticated: false,
-    github: { token: '', owner: '', repo: '', branch: 'main' },
-    data: { slider: null, misa: null, jeydem: null, news: null },
-    sha: { slider: null, misa: null, jeydem: null, news: null },
+    data: { slider: null, misa: null, jaydem: null, news: null },
     editingPostId: null
 };
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    loadGitHubConfig();
-
-    const stored = sessionStorage.getItem('cms_auth');
-    if (stored === 'ok') {
+document.addEventListener('DOMContentLoaded', async () => {
+    const res = await api('api/auth.php', { action: 'check' });
+    if (res.ok) {
         showAdmin();
     } else {
         showLogin();
@@ -43,24 +30,23 @@ function showAdmin() {
     document.getElementById('admin-layout').style.display = 'grid';
     navigateTo('dashboard');
     loadAllData();
+    initDropZones();
 }
 
 document.getElementById('login-form').addEventListener('submit', async e => {
     e.preventDefault();
-    const pw = document.getElementById('pw-input').value;
+    const pw   = document.getElementById('pw-input').value;
     const hash = await sha256(pw);
-    const storedHash = localStorage.getItem('cms_pw_hash') || DEFAULT_HASH;
-
-    if (hash === storedHash) {
-        sessionStorage.setItem('cms_auth', 'ok');
+    const res  = await api('api/auth.php', { action: 'login', hash });
+    if (res.ok) {
         showAdmin();
     } else {
-        showAlert('login-alert', 'Falsches Passwort.', 'error');
+        showAlert('login-alert', res.error || 'Falsches Passwort.', 'error');
     }
 });
 
-document.getElementById('logout-btn').addEventListener('click', () => {
-    sessionStorage.removeItem('cms_auth');
+document.getElementById('logout-btn').addEventListener('click', async () => {
+    await api('api/auth.php', { action: 'logout' });
     showLogin();
 });
 
@@ -83,124 +69,219 @@ document.querySelectorAll('[data-section]').forEach(el => {
     });
 });
 
-// ─── GITHUB CONFIG ────────────────────────────────────────────────────────────
-function loadGitHubConfig() {
-    const cfg = JSON.parse(localStorage.getItem('cms_github') || '{}');
-    state.github = {
-        token:  cfg.token  || '',
-        owner:  cfg.owner  || '',
-        repo:   cfg.repo   || '',
-        branch: cfg.branch || 'main'
-    };
-    document.getElementById('gh-token').value  = state.github.token;
-    document.getElementById('gh-owner').value  = state.github.owner;
-    document.getElementById('gh-repo').value   = state.github.repo;
-    document.getElementById('gh-branch').value = state.github.branch;
-}
-
-document.getElementById('settings-github-form').addEventListener('submit', e => {
-    e.preventDefault();
-    state.github = {
-        token:  document.getElementById('gh-token').value.trim(),
-        owner:  document.getElementById('gh-owner').value.trim(),
-        repo:   document.getElementById('gh-repo').value.trim(),
-        branch: document.getElementById('gh-branch').value.trim() || 'main'
-    };
-    localStorage.setItem('cms_github', JSON.stringify(state.github));
-    showAlert('settings-alert', 'GitHub-Einstellungen gespeichert.', 'success');
-});
-
+// ─── PASSWORD CHANGE ──────────────────────────────────────────────────────────
 document.getElementById('settings-pw-form').addEventListener('submit', async e => {
     e.preventDefault();
-    const pw = document.getElementById('new-pw').value;
+    const pw  = document.getElementById('new-pw').value;
     const pw2 = document.getElementById('new-pw2').value;
     if (pw !== pw2) { showAlert('pw-alert', 'Passwörter stimmen nicht überein.', 'error'); return; }
     if (pw.length < 8) { showAlert('pw-alert', 'Mindestens 8 Zeichen erforderlich.', 'error'); return; }
     const hash = await sha256(pw);
-    localStorage.setItem('cms_pw_hash', hash);
-    showAlert('pw-alert', 'Passwort erfolgreich geändert.', 'success');
-    document.getElementById('new-pw').value = '';
-    document.getElementById('new-pw2').value = '';
+    const res  = await api('api/auth.php', { action: 'change_password', hash });
+    if (res.ok) {
+        showAlert('pw-alert', 'Passwort erfolgreich geändert.', 'success');
+        document.getElementById('new-pw').value  = '';
+        document.getElementById('new-pw2').value = '';
+    } else {
+        showAlert('pw-alert', res.error || 'Fehler beim Speichern.', 'error');
+    }
 });
 
-// ─── GITHUB API ───────────────────────────────────────────────────────────────
-async function readGitHubFile(path) {
-    const { token, owner, repo, branch } = state.github;
-    if (!token || !owner || !repo) throw new Error('GitHub-Konfiguration unvollständig. Bitte unter Einstellungen ausfüllen.');
-
-    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`, {
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-    });
-
-    if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || `HTTP ${res.status}`);
+// ─── API HELPER ───────────────────────────────────────────────────────────────
+async function api(endpoint, body) {
+    try {
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+            credentials: 'same-origin'
+        });
+        if (res.status === 401) return { ok: false, error: 'Sitzung abgelaufen – bitte neu anmelden.' };
+        return await res.json();
+    } catch {
+        return { ok: false, error: 'Netzwerkfehler – ist der Server erreichbar?' };
     }
-
-    const fileData = await res.json();
-    const content = JSON.parse(decodeURIComponent(escape(atob(fileData.content.replace(/\n/g, '')))));
-    return { content, sha: fileData.sha };
 }
 
-async function writeGitHubFile(path, content, sha) {
-    const { token, owner, repo, branch } = state.github;
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2))));
+// ─── FILE UPLOAD ──────────────────────────────────────────────────────────────
+async function uploadFile(file, target) {
+    const form = new FormData();
+    form.append('target', target);
+    form.append('file', file);
+    try {
+        const res = await fetch('api/upload.php', {
+            method: 'POST',
+            body: form,
+            credentials: 'same-origin'
+        });
+        return await res.json();
+    } catch {
+        return { ok: false, error: 'Upload fehlgeschlagen' };
+    }
+}
 
-    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.github.v3+json'
-        },
-        body: JSON.stringify({ message: `CMS: Update ${path}`, content: encoded, sha, branch })
+// ─── FILE DELETE ──────────────────────────────────────────────────────────────
+async function deleteFile(src) {
+    return api('api/delete.php', { src });
+}
+
+// ─── DROP ZONES ───────────────────────────────────────────────────────────────
+function initDropZones() {
+    // Portfolio drop zones — upload + add to gallery + auto-save
+    initDropZone('drop-misa',   'misa',   'status-misa',   (res) => {
+        if (!state.data.misa) state.data.misa = { artist: 'Misa', gallery: [] };
+        state.data.misa.gallery.push({ src: res.src, alt: 'Misa Tattoo' });
+        renderPortfolio('misa');
+        saveSection('misa', 'misa-save-alert');
+    });
+    initDropZone('drop-jaydem', 'jaydem', 'status-jaydem', (res) => {
+        if (!state.data.jaydem) state.data.jaydem = { artist: 'Jaydem', gallery: [] };
+        state.data.jaydem.gallery.push({ src: res.src, alt: 'Jaydem Tattoo' });
+        renderPortfolio('jaydem');
+        saveSection('jaydem', 'jaydem-save-alert');
     });
 
-    if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || `HTTP ${res.status}`);
+    // Slider drop zone — upload + add to slides + auto-save
+    initDropZone('drop-slider', 'slider', 'status-slider', (res) => {
+        if (!state.data.slider) state.data.slider = { slides: [], interval: 5000 };
+        const alt = res.filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+        state.data.slider.slides.push({ src: res.src, alt });
+        renderSlider();
+        saveSection('slider', 'slider-save-alert');
+    });
+
+    // News title image drop zone — upload only, sets input value
+    initDropZone('drop-news-img', 'news', 'status-news-img', (res) => {
+        document.getElementById('post-image').value = res.src;
+    }, true); // single-file mode
+
+    // Artist profile image drop zones — single file, updates artists.json
+    initDropZone('drop-artist-misa', 'artists', 'status-artist-misa', (res) => {
+        if (!state.data.artists) state.data.artists = {};
+        if (!state.data.artists.misa) state.data.artists.misa = {};
+        state.data.artists.misa.image = res.src;
+        const img = document.getElementById('preview-artist-misa');
+        if (img) { img.src = '../' + res.src; img.style.display = ''; }
+        saveSection('artists', 'artists-save-alert');
+    }, true);
+
+    initDropZone('drop-artist-jaydem', 'artists', 'status-artist-jaydem', (res) => {
+        if (!state.data.artists) state.data.artists = {};
+        if (!state.data.artists.jaydem) state.data.artists.jaydem = {};
+        state.data.artists.jaydem.image = res.src;
+        const img = document.getElementById('preview-artist-jaydem');
+        if (img) { img.src = '../' + res.src; img.style.display = ''; }
+        saveSection('artists', 'artists-save-alert');
+    }, true);
+}
+
+function initDropZone(zoneId, target, statusId, onSuccess, single = false) {
+    const zone   = document.getElementById(zoneId);
+    const input  = document.getElementById(zoneId.replace('drop-', 'file-'));
+    const status = document.getElementById(statusId);
+    if (!zone || !input) return;
+
+    // Click to open file picker
+    zone.addEventListener('click', e => {
+        if (e.target === input) return;
+        input.click();
+    });
+
+    // Drag events
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        processFiles(Array.from(e.dataTransfer.files), target, status, onSuccess, single);
+    });
+
+    // File input change
+    input.addEventListener('change', () => {
+        processFiles(Array.from(input.files), target, status, onSuccess, single);
+        input.value = '';
+    });
+}
+
+async function processFiles(files, target, statusEl, onSuccess, single) {
+    const images = files.filter(f => f.type.startsWith('image/'));
+    if (images.length === 0) {
+        setStatus(statusEl, 'Nur Bilddateien erlaubt.', 'err');
+        return;
     }
-    return (await res.json()).content.sha;
+
+    const toUpload = single ? [images[0]] : images;
+
+    for (let i = 0; i < toUpload.length; i++) {
+        const file = toUpload[i];
+        setStatus(statusEl, `Lade hoch ${i + 1}/${toUpload.length}: ${file.name}…`);
+        const res = await uploadFile(file, target);
+        if (res.ok) {
+            onSuccess(res);
+        } else {
+            setStatus(statusEl, `Fehler: ${res.error}`, 'err');
+            return;
+        }
+    }
+
+    setStatus(statusEl, `${toUpload.length} Datei${toUpload.length > 1 ? 'en' : ''} hochgeladen.`, 'ok');
+    setTimeout(() => setStatus(statusEl, ''), 4000);
+}
+
+function setStatus(el, msg, cls = '') {
+    if (!el) return;
+    el.textContent = msg;
+    el.className   = 'upload-status' + (cls ? ' ' + cls : '');
 }
 
 // ─── LOAD ALL DATA ────────────────────────────────────────────────────────────
 async function loadAllData() {
-    for (const [key, path] of Object.entries(CONTENT_FILES)) {
-        try {
-            const { content, sha } = await readGitHubFile(path);
-            state.data[key] = content;
-            state.sha[key]  = sha;
-        } catch {
-            // Fall back to fetching from the local site for display-only
-            try {
-                const res = await fetch('../' + path);
-                state.data[key] = await res.json();
-            } catch { /* no-op */ }
-        }
+    const res = await api('api/load.php', {});
+    if (!res.ok) {
+        showAlert('dashboard-alert', res.error || 'Fehler beim Laden der Inhalte.', 'error');
+        return;
+    }
+    for (const key of CONTENT_KEYS) {
+        state.data[key] = res.data[key];
     }
     renderDashboard();
     renderSlider();
     renderPortfolio('misa');
-    renderPortfolio('jeydem');
+    renderPortfolio('jaydem');
     renderNewsList();
+    renderArtists();
+}
+
+// ─── SAVE TO SERVER ───────────────────────────────────────────────────────────
+async function saveSection(key, alertId) {
+    const btn = document.getElementById(`save-${key}-btn`);
+    if (btn) btn.disabled = true;
+
+    const res = await api('api/save.php', { key, content: state.data[key] });
+    if (res.ok) {
+        showAlert(alertId, 'Erfolgreich gespeichert!', 'success');
+    } else {
+        showAlert(alertId, `Fehler: ${res.error}`, 'error');
+    }
+    if (btn) btn.disabled = false;
 }
 
 // ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function renderDashboard() {
     const slides   = state.data.slider?.slides?.length  ?? '–';
     const misaImgs = state.data.misa?.gallery?.length   ?? '–';
-    const jeyImgs  = state.data.jeydem?.gallery?.length ?? '–';
+    const jeyImgs  = state.data.jaydem?.gallery?.length ?? '–';
     const posts    = (state.data.news?.posts || []).filter(p => p.published).length;
 
     document.getElementById('stat-slides').textContent = slides;
     document.getElementById('stat-misa').textContent   = misaImgs;
-    document.getElementById('stat-jeydem').textContent = jeyImgs;
+    document.getElementById('stat-jaydem').textContent = jeyImgs;
     document.getElementById('stat-posts').textContent  = posts;
 }
 
 // ─── SLIDER MANAGER ───────────────────────────────────────────────────────────
 function renderSlider() {
-    const list = document.getElementById('slider-list');
+    const list   = document.getElementById('slider-list');
     const slides = state.data.slider?.slides || [];
 
     if (slides.length === 0) {
@@ -225,7 +306,6 @@ document.getElementById('add-slide-form').addEventListener('submit', e => {
     const src = document.getElementById('slide-src').value.trim();
     const alt = document.getElementById('slide-alt').value.trim();
     if (!src) return;
-
     if (!state.data.slider) state.data.slider = { slides: [], interval: 5000 };
     state.data.slider.slides.push({ src, alt });
     document.getElementById('slide-src').value = '';
@@ -267,24 +347,31 @@ function renderPortfolio(artist) {
             <div class="item-actions">
                 ${i > 0 ? `<button class="btn btn-secondary btn-sm" onclick="movePortfolioImg('${artist}',${i},-1)">↑</button>` : ''}
                 ${i < images.length - 1 ? `<button class="btn btn-secondary btn-sm" onclick="movePortfolioImg('${artist}',${i},1)">↓</button>` : ''}
-                <button class="btn btn-danger btn-sm" onclick="removePortfolioImg('${artist}',${i})">×</button>
+                <button class="btn btn-danger btn-sm" onclick="removePortfolioImg('${artist}',${i})">Löschen</button>
             </div>
         </li>`).join('');
 }
 
-document.getElementById('add-misa-form').addEventListener('submit', e => addPortfolioImg(e, 'misa'));
-document.getElementById('add-jeydem-form').addEventListener('submit', e => addPortfolioImg(e, 'jeydem'));
+async function removePortfolioImg(artist, i) {
+    const img = state.data[artist]?.gallery?.[i];
+    if (!img) return;
+    if (!confirm(`Bild "${img.src}" wirklich löschen?\nDie Datei wird dauerhaft vom Server entfernt.`)) return;
 
-function addPortfolioImg(e, artist) {
-    e.preventDefault();
-    const src = document.getElementById(`${artist}-img-src`).value.trim();
-    const alt = document.getElementById(`${artist}-img-alt`).value.trim();
-    if (!src) return;
-    if (!state.data[artist]) state.data[artist] = { artist, gallery: [] };
-    state.data[artist].gallery.push({ src, alt });
-    document.getElementById(`${artist}-img-src`).value = '';
-    document.getElementById(`${artist}-img-alt`).value = '';
+    // Disable all delete buttons while working
+    document.querySelectorAll('.btn-danger').forEach(b => b.disabled = true);
+
+    const res = await deleteFile(img.src);
+    if (!res.ok) {
+        showAlert(`${artist}-save-alert`, `Datei konnte nicht gelöscht werden: ${res.error}`, 'error');
+        document.querySelectorAll('.btn-danger').forEach(b => b.disabled = false);
+        return;
+    }
+
+    state.data[artist].gallery.splice(i, 1);
     renderPortfolio(artist);
+    renderDashboard();
+    await saveSection(artist, `${artist}-save-alert`);
+    document.querySelectorAll('.btn-danger').forEach(b => b.disabled = false);
 }
 
 function movePortfolioImg(artist, i, dir) {
@@ -295,16 +382,10 @@ function movePortfolioImg(artist, i, dir) {
     renderPortfolio(artist);
 }
 
-function removePortfolioImg(artist, i) {
-    if (!confirm('Bild entfernen?')) return;
-    state.data[artist].gallery.splice(i, 1);
-    renderPortfolio(artist);
-}
-
 document.getElementById('save-misa-btn').addEventListener('click', () =>
     saveSection('misa', 'misa-save-alert'));
-document.getElementById('save-jeydem-btn').addEventListener('click', () =>
-    saveSection('jeydem', 'jeydem-save-alert'));
+document.getElementById('save-jaydem-btn').addEventListener('click', () =>
+    saveSection('jaydem', 'jaydem-save-alert'));
 
 // Portfolio tabs
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -315,6 +396,45 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.add('active');
         parent.querySelector(`#${btn.dataset.tab}`).classList.add('active');
     });
+});
+
+// ─── ARTISTS MANAGER ──────────────────────────────────────────────────────────
+function renderArtists() {
+    const misa   = state.data.artists?.misa   || {};
+    const jaydem = state.data.artists?.jaydem || {};
+
+    const setField = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+    const setImg   = (id, src) => {
+        const el = document.getElementById(id);
+        if (el && src) { el.src = '../' + src; el.style.display = ''; }
+    };
+
+    setField('artist-misa-spec',   misa.specializedIn);
+    setField('artist-misa-ig-dm',  misa.instagramDm);
+    setImg  ('preview-artist-misa', misa.image);
+
+    setField('artist-jaydem-spec',   jaydem.specializedIn);
+    setField('artist-jaydem-ig-dm',  jaydem.instagramDm);
+    setImg  ('preview-artist-jaydem', jaydem.image);
+}
+
+function collectArtistFields() {
+    const read = id => (document.getElementById(id)?.value || '').trim();
+    if (!state.data.artists) state.data.artists = {};
+    const a = state.data.artists;
+
+    if (!a.misa)   a.misa   = {};
+    if (!a.jaydem) a.jaydem = {};
+
+    a.misa.specializedIn  = read('artist-misa-spec')   || a.misa.specializedIn;
+    a.misa.instagramDm    = read('artist-misa-ig-dm')  || a.misa.instagramDm;
+    a.jaydem.specializedIn = read('artist-jaydem-spec') || a.jaydem.specializedIn;
+    a.jaydem.instagramDm   = read('artist-jaydem-ig-dm')|| a.jaydem.instagramDm;
+}
+
+document.getElementById('save-artists-btn').addEventListener('click', () => {
+    collectArtistFields();
+    saveSection('artists', 'artists-save-alert');
 });
 
 // ─── NEWS MANAGER ─────────────────────────────────────────────────────────────
@@ -351,9 +471,9 @@ document.getElementById('cancel-post-btn').addEventListener('click', () => {
     state.editingPostId = null;
 });
 
-document.getElementById('post-form').addEventListener('submit', e => {
+document.getElementById('post-form').addEventListener('submit', async e => {
     e.preventDefault();
-    savePost();
+    await savePost();
 });
 
 function clearPostForm() {
@@ -383,7 +503,7 @@ function editPost(id) {
     document.getElementById('post-form-section').scrollIntoView({ behavior: 'smooth' });
 }
 
-function savePost() {
+async function savePost() {
     const title     = document.getElementById('post-title').value.trim();
     const date      = document.getElementById('post-date').value;
     const excerpt   = document.getElementById('post-excerpt').value.trim();
@@ -393,58 +513,57 @@ function savePost() {
     const published = document.getElementById('post-published').checked;
     const tags      = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
 
+    if (!title || !date || !excerpt || !content) {
+        showAlert('news-save-alert', 'Bitte Titel, Datum, Kurzbeschreibung und Inhalt ausfüllen.', 'error');
+        return;
+    }
+
     if (!state.data.news) state.data.news = { posts: [] };
 
     if (state.editingPostId) {
         const idx = state.data.news.posts.findIndex(p => p.id === state.editingPostId);
         if (idx !== -1) {
-            state.data.news.posts[idx] = { ...state.data.news.posts[idx], title, date, excerpt, content, tags, image, published };
+            state.data.news.posts[idx] = {
+                ...state.data.news.posts[idx],
+                title, date, excerpt, content, tags, image, published
+            };
         }
     } else {
         const id = slugify(title) + '-' + Date.now();
         state.data.news.posts.unshift({ id, title, slug: id, date, excerpt, content, image, tags, published });
     }
 
-    renderNewsList();
     document.getElementById('post-form-section').style.display = 'none';
     state.editingPostId = null;
+    renderNewsList();
+    renderDashboard();
+
+    // Auto-save to server immediately
+    await saveSection('news', 'news-save-alert');
 }
 
 function deletePost(id) {
     if (!confirm('Beitrag wirklich löschen?')) return;
     state.data.news.posts = state.data.news.posts.filter(p => p.id !== id);
     renderNewsList();
+    renderDashboard();
+    saveSection('news', 'news-save-alert');
 }
 
 document.getElementById('save-news-btn').addEventListener('click', () =>
     saveSection('news', 'news-save-alert'));
 
-// ─── SAVE TO GITHUB ───────────────────────────────────────────────────────────
-async function saveSection(key, alertId) {
-    const btn = document.getElementById(`save-${key === 'misa' ? 'misa' : key === 'jeydem' ? 'jeydem' : key}-btn`);
-    if (btn) btn.disabled = true;
-
-    try {
-        const newSha = await writeGitHubFile(CONTENT_FILES[key], state.data[key], state.sha[key]);
-        state.sha[key] = newSha;
-        showAlert(alertId, 'Erfolgreich gespeichert! GitHub Pages wird automatisch aktualisiert.', 'success');
-    } catch (err) {
-        showAlert(alertId, `Fehler: ${err.message}`, 'error');
-    } finally {
-        if (btn) btn.disabled = false;
-    }
-}
-
-// Export JSON as fallback (no GitHub API needed)
+// Export JSON as fallback
 document.querySelectorAll('[data-export]').forEach(btn => {
     btn.addEventListener('click', () => {
         const key  = btn.dataset.export;
         const data = state.data[key];
         if (!data) return;
+        const filenames = { slider: 'slider.json', misa: 'portfolio-misa.json', jaydem: 'portfolio-jaydem.json', news: 'news.json' };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = CONTENT_FILES[key].split('/').pop();
+        a.download = filenames[key] || `${key}.json`;
         a.click();
         URL.revokeObjectURL(a.href);
     });
@@ -452,7 +571,7 @@ document.querySelectorAll('[data-export]').forEach(btn => {
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 async function sha256(str) {
-    const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
@@ -465,8 +584,9 @@ function slugify(str) {
 function showAlert(id, msg, type) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.className = `alert alert-${type}`;
-    el.textContent = msg;
-    el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 6000);
+    el.className      = `alert alert-${type}`;
+    el.textContent    = msg;
+    el.style.display  = 'flex';
+    clearTimeout(el._hideTimer);
+    el._hideTimer = setTimeout(() => { el.style.display = 'none'; }, 6000);
 }
