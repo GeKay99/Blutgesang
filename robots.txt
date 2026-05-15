@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /content/
+Disallow: /api/
+
+Sitemap: https://www.blutgesang-tattoo.de/sitemap.xml

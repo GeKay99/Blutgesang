@@ -1,12 +1,13 @@
         :root {
-            --bg-dark: #000000;
-            --bg-light-dark: #0a0a0a;
+            --bg-dark: #1a0808;
+            --bg-light-dark: #260e0e;
             --text-light: #e0e0e0;
             --text-muted: #a0a0a0;
-            --accent-red: #a00000; 
-            --accent-gray: #222;
+            --accent-red: #A15B5B;
+            --accent-gray: #3d2020;
             --white: #ffffff;
             --whatsapp-green: #25D366;
+            --accent-gold: #d4948c;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,7 +25,7 @@
         /* --- HEADER & NAV (SPLIT LOOK) --- */
         header {
             padding: 10px 0;
-            background: rgba(0, 0, 0, 0.85); /* Transparent */
+            background: rgba(26, 8, 8, 0.92); /* Transparent */
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--accent-gray);
             position: sticky;
@@ -105,11 +106,11 @@
 
         .hero-logo {
             position: absolute;
-            top: 50%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: clamp(180px, 35vw, 460px);
-            opacity: 0.15;
+            width: clamp(300px, 48vw, 600px);
+            opacity: 0.40;
             pointer-events: none;
             z-index: 1;
         }
@@ -284,7 +285,7 @@
 }
 
 .footer-bottom {
-    border-top: 1px solid #111;
+    border-top: 1px solid var(--accent-gray);
     padding-top: 20px;
     text-align: center;
     font-size: 0.75rem;
@@ -396,7 +397,7 @@
 
 .insta-btn:hover {
     border-color: var(--accent-red);
-    background-color: #0d0d0d;
+    background-color: var(--bg-light-dark);
     color: var(--white);
 }
 
@@ -490,7 +491,7 @@
         right: -100%; /* Versteckt außerhalb des Bildschirms */
         width: 80%;
         height: 100vh;
-        background: rgba(10, 10, 10, 0.99); /* Fast deckend */
+        background: rgba(38, 14, 14, 0.99); /* Fast deckend */
         backdrop-filter: blur(15px);
         padding-top: 100px;
         transition: 0.4s ease-in-out;
@@ -545,7 +546,7 @@
 /* --- SUB-HERO (Unterseiten) --- */
 .hero-sub {
     height: 40vh;
-    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img/slider/slider2.jpeg');
+    background: linear-gradient(rgba(26,8,8,0.72), rgba(26,8,8,0.72)), url('img/slider/slider2.jpeg');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -665,7 +666,7 @@
 /* --- ARTIST PAGE LAYOUT --- */
 .artists-hero {
     height: 40vh;
-    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img/slider/slider1.jpeg');
+    background: linear-gradient(rgba(26,8,8,0.72), rgba(26,8,8,0.72)), url('img/slider/slider1.jpeg');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -782,7 +783,7 @@
     padding: 80px 0 40px 0;
     text-align: center;
     border-bottom: 1px solid var(--accent-gray);
-    background: linear-gradient(to bottom, #050505, #000);
+    background: linear-gradient(to bottom, #1a0808, var(--bg-dark));
 }
 
 .portfolio-hero span {
@@ -1110,7 +1111,7 @@
 .news-card-image {
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    background: #111;
+    background: #1a0c0c;
 }
 
 .news-card-image img {
@@ -1124,7 +1125,7 @@
 .news-card:hover .news-card-image img { filter: grayscale(0%); }
 
 .news-card-no-image {
-    background: linear-gradient(135deg, #111 0%, #1a0000 100%);
+    background: linear-gradient(135deg, #1a0c0c 0%, #2a1212 100%);
 }
 
 .news-card-body {
@@ -1149,13 +1150,13 @@
 
 .news-tag {
     display: inline-block;
-    background: rgba(160, 0, 0, 0.15);
+    background: rgba(161, 91, 91, 0.15);
     color: var(--accent-red);
     padding: 2px 8px;
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    border: 1px solid rgba(160, 0, 0, 0.3);
+    border: 1px solid rgba(161, 91, 91, 0.3);
 }
 
 .news-card-title {
@@ -1200,7 +1201,7 @@
 .post-modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(26, 8, 8, 0.88);
     backdrop-filter: blur(4px);
 }
 
@@ -1422,8 +1423,8 @@
     left: 0;
     right: 0;
     z-index: 9999;
-    background: rgba(8, 8, 8, 0.97);
-    border-top: 1px solid #2a2a2a;
+    background: rgba(26, 8, 8, 0.97);
+    border-top: 1px solid var(--accent-gray);
     padding: 20px 24px;
     backdrop-filter: blur(4px);
     animation: cookieSlideUp 0.3s ease;
@@ -1490,7 +1491,7 @@
 
 .cookie-btn-accept {
     background: var(--accent-gold);
-    color: #a71919;
+    color: #1a0606;
 }
 
 .cookie-btn-reject {
@@ -1571,15 +1572,15 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #0d0d0d;
-    border: 1px solid #222;
+    background: var(--bg-light-dark);
+    border: 1px solid var(--accent-gray);
     border-radius: 2px;
     gap: 10px;
     text-align: center;
     padding: 40px 24px;
 }
 
-.map-blocked svg { stroke: #444; margin-bottom: 8px; }
+.map-blocked svg { stroke: var(--accent-gray); margin-bottom: 8px; }
 .map-blocked p { color: #666; font-size: 0.88rem; margin: 0; }
 
 .cookie-revoke-btn {
@@ -1609,7 +1610,7 @@
     position: fixed;
     inset: 0;
     z-index: 10000;
-    background: rgba(0, 0, 0, 0.92);
+    background: rgba(26, 8, 8, 0.95);
     align-items: center;
     justify-content: center;
 }
@@ -1632,7 +1633,7 @@
     max-width: 90vw;
     max-height: 80vh;
     object-fit: contain;
-    border: 1px solid #333;
+    border: 1px solid var(--accent-gray);
     display: block;
 }
 
@@ -1649,7 +1650,7 @@
     top: -44px;
     right: 0;
     background: transparent;
-    border: 1px solid #444;
+    border: 1px solid var(--accent-gray);
     color: #ccc;
     font-size: 1.4rem;
     line-height: 1;
@@ -1680,7 +1681,7 @@
     width: 100px;
     height: 100px;
     overflow: hidden;
-    border: 1px solid #222;
+    border: 1px solid var(--accent-gray);
     flex-shrink: 0;
     cursor: pointer;
 }
@@ -1888,4 +1889,52 @@
 
 .footer-cookie-btn:hover {
     color: var(--accent-gold);
+}
+
+/* ─── Artist Contact Row ────────────────────────────────────────────────────── */
+.artist-contact-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border: 1px solid var(--accent-gray);
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: border-color 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.contact-btn svg { flex-shrink: 0; }
+
+.contact-btn--ig:hover    { border-color: #e1306c; color: #e1306c; }
+.contact-btn--wa:hover    { border-color: var(--whatsapp-green); color: var(--whatsapp-green); }
+.contact-btn--phone:hover { border-color: var(--accent-red); color: var(--accent-red); }
+
+.artist-card .artist-contact-row {
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--accent-gray);
+}
+
+.artist-card .contact-btn {
+    padding: 8px 14px;
+    font-size: 0.75rem;
+}
+
+@media (max-width: 480px) {
+    .artist-contact-row:not(.artist-card .artist-contact-row) {
+        flex-direction: column;
+    }
 }

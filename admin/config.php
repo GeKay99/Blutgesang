@@ -4,5 +4,5 @@
 // To generate a new hash after a manual reset:
 //   php -r "echo hash('sha256', 'YourNewPassword');"
 // Then paste the result below and redeploy.
-define('ADMIN_PASSWORD_HASH', 'f31bf4da0acc65f245b2c5c918fe4d4e193305c4198a669b5031508e305601f5');
+define('ADMIN_PASSWORD_HASH', '15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225');
 define('CONTENT_BASE', realpath(dirname(__DIR__) . '/content') . DIRECTORY_SEPARATOR);

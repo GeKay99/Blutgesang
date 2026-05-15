@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     initSlider();
     initMobileNavClose();
-    initInstagramSticky();
 });
 
 // ─── DYNAMIC SLIDER ──────────────────────────────────────────────────────────
@@ -46,21 +45,6 @@ async function initSlider() {
         current = (current + 1) % els.length;
         els[current].classList.add('active');
     }, interval);
-}
-
-// ─── INSTAGRAM STICKY: click-toggle for touch devices ────────────────────────
-
-function initInstagramSticky() {
-    const trigger = document.getElementById('ig-trigger');
-    const sticky  = document.getElementById('ig-sticky');
-    if (!trigger || !sticky) return;
-    trigger.addEventListener('click', function (e) {
-        e.stopPropagation();
-        sticky.classList.toggle('active');
-    });
-    document.addEventListener('click', function () {
-        sticky.classList.remove('active');
-    });
 }
 
 // ─── MOBILE NAV: close on link click ─────────────────────────────────────────

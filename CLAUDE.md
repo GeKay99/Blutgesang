@@ -76,9 +76,7 @@ Files uploaded via the admin map to these directories:
 
 This mapping exists in four places and must be kept in sync: `admin/api/upload.php`, `admin/api/delete.php`, `dev-server.js` (`UPLOAD_TARGETS`), and the delete regex.
 
-### Sticky Instagram Button
 
-All public pages include a floating Instagram DM button (`.ig-sticky`). CSS hover reveals the options on desktop; `js/main.js::initInstagramSticky()` adds click-toggle for touch devices. Links are updated at runtime by `js/artists.js`.
 
 ### Cookie Consent (`js/cookie-consent.js`)
 
