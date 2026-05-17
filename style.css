@@ -106,13 +106,18 @@
 
         .hero-logo {
             position: absolute;
-            top: 40%;
+            top: 43%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: clamp(300px, 48vw, 600px);
+            width: clamp(320px, 48vw, 600px);
             opacity: 0.40;
             pointer-events: none;
             z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
         }
 
         .hero-content h1 {
