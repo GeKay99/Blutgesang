@@ -371,10 +371,24 @@ function moveSlide(i, dir) {
     renderSlider();
 }
 
-function removeSlide(i) {
-    if (!confirm('Slide entfernen?')) return;
+async function removeSlide(i) {
+    const slide = state.data.slider.slides[i];
+    if (!slide) return;
+    if (!confirm(`Slide entfernen?\nDie Datei wird dauerhaft vom Server entfernt.`)) return;
+    document.querySelectorAll('.btn-danger').forEach(b => b.disabled = true);
+    if (slide.src) {
+        const res = await deleteFile(slide.src);
+        if (!res.ok) {
+            showAlert('slider-save-alert', `Datei konnte nicht gelöscht werden: ${res.error}`, 'error');
+            document.querySelectorAll('.btn-danger').forEach(b => b.disabled = false);
+            return;
+        }
+    }
     state.data.slider.slides.splice(i, 1);
     renderSlider();
+    renderDashboard();
+    await saveSection('slider', 'slider-save-alert');
+    document.querySelectorAll('.btn-danger').forEach(b => b.disabled = false);
 }
 
 document.getElementById('save-slider-btn').addEventListener('click', () =>
@@ -600,12 +614,24 @@ async function savePost() {
     await saveSection('news', 'news-save-alert');
 }
 
-function deletePost(id) {
+async function deletePost(id) {
+    const post = state.data.news.posts.find(p => p.id === id);
+    if (!post) return;
     if (!confirm('Beitrag wirklich löschen?')) return;
+    document.querySelectorAll('.btn-danger').forEach(b => b.disabled = true);
+    if (post.image) {
+        const res = await deleteFile(post.image);
+        if (!res.ok) {
+            showAlert('news-save-alert', `Bilddatei konnte nicht gelöscht werden: ${res.error}`, 'error');
+            document.querySelectorAll('.btn-danger').forEach(b => b.disabled = false);
+            return;
+        }
+    }
     state.data.news.posts = state.data.news.posts.filter(p => p.id !== id);
     renderNewsList();
     renderDashboard();
-    saveSection('news', 'news-save-alert');
+    await saveSection('news', 'news-save-alert');
+    document.querySelectorAll('.btn-danger').forEach(b => b.disabled = false);
 }
 
 document.getElementById('save-news-btn').addEventListener('click', () =>
