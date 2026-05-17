@@ -5,4 +5,4 @@ Disallow: /admin/
 Disallow: /content/
 Disallow: /api/
 
-Sitemap: https://www.blutgesang-tattoo.de/sitemap.xml
+Sitemap: https://blutgesangtattoo.de/sitemap.xml
