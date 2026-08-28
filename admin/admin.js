@@ -1,10 +1,7 @@
-// ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const CONTENT_KEYS = ['slider', 'misa', 'jaydem', 'news', 'artists', 'ueber-uns', 'impressum'];
-
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let state = {
     authenticated: false,
-    data: { slider: null, misa: null, jaydem: null, news: null, 'ueber-uns': null, impressum: null },
+    data: { slider: null, news: null, artists: null, 'ueber-uns': null, impressum: null, portfolios: {} },
     editingPostId: null
 };
 
@@ -161,22 +158,8 @@ async function deleteFile(src) {
     return api('api/delete.php', { src });
 }
 
-// ─── DROP ZONES ───────────────────────────────────────────────────────────────
+// ─── DROP ZONES (static targets: slider, news, über-uns) ─────────────────────
 function initDropZones() {
-    // Portfolio drop zones — upload + add to gallery + auto-save
-    initDropZone('drop-misa',   'misa',   'status-misa',   (res) => {
-        if (!state.data.misa) state.data.misa = { artist: 'Misa', gallery: [] };
-        state.data.misa.gallery.push({ src: res.src, alt: 'Misa Tattoo' });
-        renderPortfolio('misa');
-        saveSection('misa', 'misa-save-alert');
-    });
-    initDropZone('drop-jaydem', 'jaydem', 'status-jaydem', (res) => {
-        if (!state.data.jaydem) state.data.jaydem = { artist: 'Jaydem', gallery: [] };
-        state.data.jaydem.gallery.push({ src: res.src, alt: 'Jaydem Tattoo' });
-        renderPortfolio('jaydem');
-        saveSection('jaydem', 'jaydem-save-alert');
-    });
-
     // Slider drop zone — upload + add to slides + auto-save
     initDropZone('drop-slider', 'slider', 'status-slider', (res) => {
         if (!state.data.slider) state.data.slider = { slides: [], interval: 5000 };
@@ -191,25 +174,6 @@ function initDropZones() {
     initDropZone('drop-news-img', 'news', 'status-news-img', (res) => {
         document.getElementById('post-image').value = res.src;
     }, true); // single-file mode
-
-    // Artist profile image drop zones — single file, updates artists.json
-    initDropZone('drop-artist-misa', 'artists', 'status-artist-misa', (res) => {
-        if (!state.data.artists) state.data.artists = {};
-        if (!state.data.artists.misa) state.data.artists.misa = {};
-        state.data.artists.misa.image = res.src;
-        const img = document.getElementById('preview-artist-misa');
-        if (img) { img.src = '../' + res.src; img.style.display = ''; }
-        saveSection('artists', 'artists-save-alert');
-    }, true);
-
-    initDropZone('drop-artist-jaydem', 'artists', 'status-artist-jaydem', (res) => {
-        if (!state.data.artists) state.data.artists = {};
-        if (!state.data.artists.jaydem) state.data.artists.jaydem = {};
-        state.data.artists.jaydem.image = res.src;
-        const img = document.getElementById('preview-artist-jaydem');
-        if (img) { img.src = '../' + res.src; img.style.display = ''; }
-        saveSection('artists', 'artists-save-alert');
-    }, true);
 
     // Über-uns image drop zones
     initDropZone('drop-uu-story', 'ueber-uns', 'status-uu-story', (res) => {
@@ -227,6 +191,27 @@ function initDropZones() {
         if (img) { img.src = '../' + res.src; img.style.display = ''; }
         saveSection('ueber-uns', 'ueber-uns-save-alert');
     }, true);
+}
+
+// Re-bound every time the artist tabs are (re-)rendered, since the drop zones
+// themselves are recreated (one portfolio zone + one profile-image zone per artist).
+function initArtistDropZones() {
+    artistSlugs().forEach(slug => {
+        initDropZone(`drop-portfolio-${slug}`, `portfolio:${slug}`, `status-portfolio-${slug}`, (res) => {
+            if (!state.data.portfolios[slug]) state.data.portfolios[slug] = { artist: slug, gallery: [] };
+            state.data.portfolios[slug].gallery.push({ src: res.src, alt: (state.data.artists[slug]?.name || slug) + ' Tattoo' });
+            renderPortfolioList(slug);
+            renderDashboard();
+            saveSection(`portfolio:${slug}`, `portfolio-${slug}-save-alert`);
+        });
+
+        initDropZone(`drop-artist-${slug}`, 'artists', `status-artist-${slug}`, (res) => {
+            state.data.artists[slug].image = res.src;
+            const img = document.getElementById(`preview-artist-${slug}`);
+            if (img) { img.src = '../' + res.src; img.style.display = ''; }
+            saveSection('artists', 'artists-save-alert');
+        }, true);
+    });
 }
 
 function initDropZone(zoneId, target, statusId, onSuccess, single = false) {
@@ -295,17 +280,18 @@ async function loadAllData() {
         showAlert('dashboard-alert', res.error || 'Fehler beim Laden der Inhalte.', 'error');
         return;
     }
-    for (const key of CONTENT_KEYS) {
-        state.data[key] = res.data[key];
-    }
+    state.data = res.data;
+    if (!state.data.artists) state.data.artists = {};
+    if (!state.data.portfolios) state.data.portfolios = {};
+
     renderDashboard();
     renderSlider();
-    renderPortfolio('misa');
-    renderPortfolio('jaydem');
+    renderPortfolioTabs();
     renderNewsList();
-    renderArtists();
+    renderArtistTabs();
     renderUeberUns();
     renderImpressum();
+    initArtistDropZones();
 }
 
 // ─── SAVE TO SERVER ───────────────────────────────────────────────────────────
@@ -313,7 +299,8 @@ async function saveSection(key, alertId) {
     const btn = document.getElementById(`save-${key}-btn`);
     if (btn) btn.disabled = true;
 
-    const res = await api('api/save.php', { key, content: state.data[key] });
+    const content = key.startsWith('portfolio:') ? state.data.portfolios[key.slice('portfolio:'.length)] : state.data[key];
+    const res = await api('api/save.php', { key, content });
     if (res.ok) {
         showAlert(alertId, 'Erfolgreich gespeichert!', 'success');
     } else {
@@ -322,17 +309,76 @@ async function saveSection(key, alertId) {
     if (btn) btn.disabled = false;
 }
 
+// ─── SMALL HTML HELPER ────────────────────────────────────────────────────────
+function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function artistSlugs() {
+    return Object.keys(state.data.artists || {});
+}
+
+// ─── TAB SWITCHING (delegated so it also works for dynamically added tabs) ───
+document.addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    const parent = btn.closest('.tabs').parentElement;
+    parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = parent.querySelector('#' + CSS.escape(btn.dataset.tab));
+    if (panel) panel.classList.add('active');
+});
+
+// Export JSON as fallback (delegated — export buttons are created dynamically
+// for portfolio/artist panels too)
+document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-export]');
+    if (!btn) return;
+    const key = btn.dataset.export;
+    let data, filename;
+    if (key.startsWith('portfolio:')) {
+        const slug = key.slice('portfolio:'.length);
+        data = state.data.portfolios[slug];
+        filename = `portfolio-${slug}.json`;
+    } else {
+        data = state.data[key];
+        filename = { slider: 'slider.json', news: 'news.json', artists: 'artists.json' }[key] || `${key}.json`;
+    }
+    if (!data) return;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+});
+
+// Save buttons for dynamically created portfolio panels
+document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-save-portfolio]');
+    if (!btn) return;
+    const slug = btn.dataset.savePortfolio;
+    saveSection(`portfolio:${slug}`, `portfolio-${slug}-save-alert`);
+});
+
 // ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function renderDashboard() {
-    const slides   = state.data.slider?.slides?.length  ?? '–';
-    const misaImgs = state.data.misa?.gallery?.length   ?? '–';
-    const jeyImgs  = state.data.jaydem?.gallery?.length ?? '–';
-    const posts    = (state.data.news?.posts || []).filter(p => p.published).length;
+    const slides = state.data.slider?.slides?.length ?? '–';
+    const posts  = (state.data.news?.posts || []).filter(p => p.published).length;
 
     document.getElementById('stat-slides').textContent = slides;
-    document.getElementById('stat-misa').textContent   = misaImgs;
-    document.getElementById('stat-jaydem').textContent = jeyImgs;
     document.getElementById('stat-posts').textContent  = posts;
+
+    const container = document.getElementById('artist-stat-cards');
+    if (container) {
+        container.innerHTML = artistSlugs().map(slug => {
+            const count = state.data.portfolios[slug]?.gallery?.length ?? 0;
+            const name  = esc(state.data.artists[slug]?.name || slug);
+            return `<div class="stat-card"><div class="stat-num">${count}</div><div class="stat-label">Portfolio ${name}</div></div>`;
+        }).join('');
+    }
 }
 
 // ─── SLIDER MANAGER ───────────────────────────────────────────────────────────
@@ -395,9 +441,50 @@ document.getElementById('save-slider-btn').addEventListener('click', () =>
     saveSection('slider', 'slider-save-alert'));
 
 // ─── PORTFOLIO MANAGER ────────────────────────────────────────────────────────
-function renderPortfolio(artist) {
-    const list   = document.getElementById(`portfolio-list-${artist}`);
-    const images = state.data[artist]?.gallery || [];
+function renderPortfolioTabs() {
+    const tabsEl   = document.getElementById('portfolio-tabs');
+    const panelsEl = document.getElementById('portfolio-panels');
+    const slugs    = artistSlugs();
+
+    if (slugs.length === 0) {
+        tabsEl.innerHTML   = '';
+        panelsEl.innerHTML = '<p style="color:var(--text-muted)">Noch keine Artists angelegt. Lege zuerst einen Artist im Bereich "Artists" an.</p>';
+        return;
+    }
+
+    tabsEl.innerHTML = slugs.map((slug, i) => {
+        const name = esc(state.data.artists[slug]?.name || slug);
+        return `<button class="tab-btn${i === 0 ? ' active' : ''}" data-tab="tab-portfolio-${slug}">${name}</button>`;
+    }).join('');
+
+    panelsEl.innerHTML = slugs.map((slug, i) => {
+        const name = esc(state.data.artists[slug]?.name || slug);
+        return `
+        <div id="tab-portfolio-${slug}" class="tab-panel${i === 0 ? ' active' : ''}">
+            <div id="portfolio-${slug}-save-alert" class="alert" style="display:none"></div>
+            <ul id="portfolio-list-${slug}" class="item-list"></ul>
+
+            <div class="drop-zone" id="drop-portfolio-${slug}" data-target="portfolio:${slug}">
+                <input type="file" accept="image/*" multiple hidden id="file-portfolio-${slug}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                <p><strong>Bilder hierher ziehen</strong> oder klicken zum Auswählen</p>
+                <p style="margin-top:4px;font-size:0.75rem">Dateien werden direkt in den ${name}-Portfolio-Ordner hochgeladen</p>
+                <div class="upload-status" id="status-portfolio-${slug}"></div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" data-save-portfolio="${slug}">Speichern</button>
+                <button class="btn btn-secondary" data-export="portfolio:${slug}">JSON herunterladen</button>
+            </div>
+        </div>`;
+    }).join('');
+
+    slugs.forEach(renderPortfolioList);
+}
+
+function renderPortfolioList(slug) {
+    const list   = document.getElementById(`portfolio-list-${slug}`);
+    if (!list) return;
+    const images = state.data.portfolios[slug]?.gallery || [];
 
     if (images.length === 0) {
         list.innerHTML = '<li class="item-list-entry"><span class="item-label" style="color:var(--text-muted)">Keine Bilder vorhanden.</span></li>';
@@ -406,107 +493,194 @@ function renderPortfolio(artist) {
 
     list.innerHTML = images.map((img, i) => `
         <li class="item-list-entry">
-            <img class="item-thumb" src="../${img.src}" alt="${img.alt}" onerror="this.style.display='none'">
+            <img class="item-thumb" src="../${img.src}" alt="${esc(img.alt)}" onerror="this.style.display='none'">
             <span class="item-label">${img.src}</span>
             <div class="item-actions">
-                ${i > 0 ? `<button class="btn btn-secondary btn-sm" onclick="movePortfolioImg('${artist}',${i},-1)">↑</button>` : ''}
-                ${i < images.length - 1 ? `<button class="btn btn-secondary btn-sm" onclick="movePortfolioImg('${artist}',${i},1)">↓</button>` : ''}
-                <button class="btn btn-danger btn-sm" onclick="removePortfolioImg('${artist}',${i})">Löschen</button>
+                ${i > 0 ? `<button class="btn btn-secondary btn-sm" onclick="movePortfolioImg('${slug}',${i},-1)">↑</button>` : ''}
+                ${i < images.length - 1 ? `<button class="btn btn-secondary btn-sm" onclick="movePortfolioImg('${slug}',${i},1)">↓</button>` : ''}
+                <button class="btn btn-danger btn-sm" onclick="removePortfolioImg('${slug}',${i})">Löschen</button>
             </div>
         </li>`).join('');
 }
 
-async function removePortfolioImg(artist, i) {
-    const img = state.data[artist]?.gallery?.[i];
+async function removePortfolioImg(slug, i) {
+    const img = state.data.portfolios[slug]?.gallery?.[i];
     if (!img) return;
     if (!confirm(`Bild "${img.src}" wirklich löschen?\nDie Datei wird dauerhaft vom Server entfernt.`)) return;
 
-    // Disable all delete buttons while working
     document.querySelectorAll('.btn-danger').forEach(b => b.disabled = true);
 
     const res = await deleteFile(img.src);
     if (!res.ok) {
-        showAlert(`${artist}-save-alert`, `Datei konnte nicht gelöscht werden: ${res.error}`, 'error');
+        showAlert(`portfolio-${slug}-save-alert`, `Datei konnte nicht gelöscht werden: ${res.error}`, 'error');
         document.querySelectorAll('.btn-danger').forEach(b => b.disabled = false);
         return;
     }
 
-    state.data[artist].gallery.splice(i, 1);
-    renderPortfolio(artist);
+    state.data.portfolios[slug].gallery.splice(i, 1);
+    renderPortfolioList(slug);
     renderDashboard();
-    await saveSection(artist, `${artist}-save-alert`);
+    await saveSection(`portfolio:${slug}`, `portfolio-${slug}-save-alert`);
     document.querySelectorAll('.btn-danger').forEach(b => b.disabled = false);
 }
 
-function movePortfolioImg(artist, i, dir) {
-    const gallery = state.data[artist].gallery;
+function movePortfolioImg(slug, i, dir) {
+    const gallery = state.data.portfolios[slug].gallery;
     const j = i + dir;
     if (j < 0 || j >= gallery.length) return;
     [gallery[i], gallery[j]] = [gallery[j], gallery[i]];
-    renderPortfolio(artist);
+    renderPortfolioList(slug);
 }
 
-document.getElementById('save-misa-btn').addEventListener('click', () =>
-    saveSection('misa', 'misa-save-alert'));
-document.getElementById('save-jaydem-btn').addEventListener('click', () =>
-    saveSection('jaydem', 'jaydem-save-alert'));
-
-// Portfolio tabs
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const parent = btn.closest('.tabs').parentElement;
-        parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        parent.querySelector(`#${btn.dataset.tab}`).classList.add('active');
-    });
-});
-
 // ─── ARTISTS MANAGER ──────────────────────────────────────────────────────────
-function renderArtists() {
-    const misa   = state.data.artists?.misa   || {};
-    const jaydem = state.data.artists?.jaydem || {};
+function renderArtistTabs() {
+    const tabsEl   = document.getElementById('artist-tabs');
+    const panelsEl = document.getElementById('artist-panels');
+    const slugs    = artistSlugs();
 
-    const setField = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
-    const setImg   = (id, src) => {
-        const el = document.getElementById(id);
-        if (el && src) { el.src = '../' + src; el.style.display = ''; }
-    };
+    if (slugs.length === 0) {
+        tabsEl.innerHTML   = '';
+        panelsEl.innerHTML = '<p style="color:var(--text-muted)">Noch keine Artists angelegt.</p>';
+        return;
+    }
 
-    setField('artist-misa-spec',       misa.specializedIn);
-    setField('artist-misa-bio',        misa.bio);
-    setField('artist-misa-bio-detail', misa.bioDetail);
-    setField('artist-misa-ig-dm',      misa.instagramDm);
-    setImg  ('preview-artist-misa',    misa.image);
+    tabsEl.innerHTML = slugs.map((slug, i) => {
+        const name = esc(state.data.artists[slug]?.name || slug);
+        return `<button class="tab-btn${i === 0 ? ' active' : ''}" data-tab="tab-artist-${slug}">${name}</button>`;
+    }).join('');
 
-    setField('artist-jaydem-spec',       jaydem.specializedIn);
-    setField('artist-jaydem-bio',        jaydem.bio);
-    setField('artist-jaydem-bio-detail', jaydem.bioDetail);
-    setField('artist-jaydem-ig-dm',      jaydem.instagramDm);
-    setImg  ('preview-artist-jaydem',    jaydem.image);
+    panelsEl.innerHTML = slugs.map((slug, i) => {
+        const a = state.data.artists[slug] || {};
+        return `
+        <div id="tab-artist-${slug}" class="tab-panel${i === 0 ? ' active' : ''}" style="max-width:560px">
+            <div class="form-group">
+                <label>Profilbild</label>
+                <div style="display:flex;gap:16px;align-items:center;margin-bottom:12px">
+                    <img id="preview-artist-${slug}" src="${a.image ? '../' + esc(a.image) : ''}" alt="${esc(a.name || slug)}"
+                         style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);${a.image ? '' : 'display:none;'}"
+                         onerror="this.style.display='none'">
+                    <span style="color:var(--text-muted);font-size:0.8rem">Aktuelles Bild</span>
+                </div>
+                <div class="drop-zone drop-zone-sm" id="drop-artist-${slug}">
+                    <input type="file" accept="image/*" hidden id="file-artist-${slug}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    <p>Neues Bild hochladen (ersetzt aktuelles)</p>
+                    <div class="upload-status" id="status-artist-${slug}"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="artist-${slug}-name" value="${esc(a.name)}" placeholder="z.B. Misa Tattoo">
+            </div>
+            <div class="form-group">
+                <label>Spezialisierung (erscheint auf der Artist-Seite)</label>
+                <input type="text" id="artist-${slug}-spec" value="${esc(a.specializedIn)}" placeholder="z.B. Fineline & Blackwork">
+            </div>
+            <div class="form-group">
+                <label>Kurztext auf der Artists-Übersichtsseite</label>
+                <textarea id="artist-${slug}-bio" rows="3" placeholder="Kurze Beschreibung für die Übersichtsseite (artists.html)">${esc(a.bio)}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Detailtext auf der Portfolio-Seite</label>
+                <textarea id="artist-${slug}-bio-detail" rows="4" placeholder="Ausführlichere Beschreibung für die individuelle Portfolio-Seite">${esc(a.bioDetail)}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Instagram-Profil (für den Footer-Link)</label>
+                <input type="url" id="artist-${slug}-instagram" value="${esc(a.instagram)}" placeholder="https://www.instagram.com/benutzername/">
+            </div>
+            <div class="form-group">
+                <label>Instagram DM-Link</label>
+                <input type="url" id="artist-${slug}-ig-dm" value="${esc(a.instagramDm)}" placeholder="https://ig.me/m/benutzername">
+            </div>
+            <div class="form-group">
+                <label>WhatsApp-Nummer (nur Ziffern, mit Ländervorwahl)</label>
+                <input type="text" id="artist-${slug}-whatsapp" value="${esc(a.whatsapp)}" placeholder="491701234567">
+            </div>
+            <button class="btn btn-danger btn-sm" data-remove-artist="${slug}" style="margin-top:8px">Artist entfernen</button>
+        </div>`;
+    }).join('');
 }
 
 function collectArtistFields() {
     const read = id => (document.getElementById(id)?.value || '').trim();
-    if (!state.data.artists) state.data.artists = {};
-    const a = state.data.artists;
-
-    if (!a.misa)   a.misa   = {};
-    if (!a.jaydem) a.jaydem = {};
-
-    a.misa.specializedIn  = read('artist-misa-spec')        || a.misa.specializedIn;
-    a.misa.bio            = read('artist-misa-bio')         || a.misa.bio;
-    a.misa.bioDetail      = read('artist-misa-bio-detail')  || a.misa.bioDetail;
-    a.misa.instagramDm    = read('artist-misa-ig-dm')       || a.misa.instagramDm;
-    a.jaydem.specializedIn = read('artist-jaydem-spec')       || a.jaydem.specializedIn;
-    a.jaydem.bio           = read('artist-jaydem-bio')        || a.jaydem.bio;
-    a.jaydem.bioDetail     = read('artist-jaydem-bio-detail') || a.jaydem.bioDetail;
-    a.jaydem.instagramDm   = read('artist-jaydem-ig-dm')      || a.jaydem.instagramDm;
+    artistSlugs().forEach(slug => {
+        const a = state.data.artists[slug];
+        if (!a) return;
+        a.name          = read(`artist-${slug}-name`)        || a.name;
+        a.specializedIn = read(`artist-${slug}-spec`)        || a.specializedIn;
+        a.bio           = read(`artist-${slug}-bio`)         || a.bio;
+        a.bioDetail     = read(`artist-${slug}-bio-detail`)  || a.bioDetail;
+        a.instagram     = read(`artist-${slug}-instagram`)   || a.instagram;
+        a.instagramDm   = read(`artist-${slug}-ig-dm`)       || a.instagramDm;
+        a.whatsapp      = read(`artist-${slug}-whatsapp`)    || a.whatsapp;
+    });
 }
 
 document.getElementById('save-artists-btn').addEventListener('click', () => {
     collectArtistFields();
     saveSection('artists', 'artists-save-alert');
+});
+
+document.getElementById('add-artist-btn').addEventListener('click', async () => {
+    const name = (prompt('Name des neuen Artists:') || '').trim();
+    if (!name) return;
+
+    let slug = slugify(name);
+    if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+        showAlert('artists-save-alert', 'Ungültiger Name für die Slug-Erzeugung.', 'error');
+        return;
+    }
+    if (state.data.artists[slug]) {
+        showAlert('artists-save-alert', `Ein Artist mit dem Kürzel "${slug}" existiert bereits.`, 'error');
+        return;
+    }
+
+    state.data.artists[slug] = {
+        name, specializedIn: '', image: '', instagram: '', instagramDm: '', whatsapp: '', bio: '', bioDetail: ''
+    };
+    state.data.portfolios[slug] = { artist: name, gallery: [] };
+
+    renderArtistTabs();
+    renderPortfolioTabs();
+    renderDashboard();
+    initArtistDropZones();
+
+    await saveSection('artists', 'artists-save-alert');
+    await saveSection(`portfolio:${slug}`, `portfolio-${slug}-save-alert`);
+});
+
+document.addEventListener('click', async e => {
+    const btn = e.target.closest('[data-remove-artist]');
+    if (!btn) return;
+    const slug = btn.dataset.removeArtist;
+    const a    = state.data.artists[slug];
+    if (!a) return;
+
+    if (!confirm(`Artist "${a.name || slug}" wirklich entfernen?\nAlle Portfolio-Bilder und das Profilbild werden dauerhaft vom Server gelöscht.`)) return;
+
+    btn.disabled = true;
+
+    const gallery = state.data.portfolios[slug]?.gallery || [];
+    for (const img of gallery) {
+        if (img.src) await deleteFile(img.src);
+    }
+    if (a.image) await deleteFile(a.image);
+
+    // Empty the artist's portfolio file first: saveSection() reads the content
+    // out of state, so this has to happen before the slug is removed from it.
+    state.data.portfolios[slug] = { artist: a.name || slug, gallery: [] };
+    await saveSection(`portfolio:${slug}`, 'artists-save-alert');
+
+    delete state.data.artists[slug];
+    delete state.data.portfolios[slug];
+
+    renderArtistTabs();
+    renderPortfolioTabs();
+    renderDashboard();
+    initArtistDropZones();
+
+    // Saved last so its success message is the one left on screen.
+    await saveSection('artists', 'artists-save-alert');
 });
 
 // ─── NEWS MANAGER ─────────────────────────────────────────────────────────────
@@ -636,22 +810,6 @@ async function deletePost(id) {
 
 document.getElementById('save-news-btn').addEventListener('click', () =>
     saveSection('news', 'news-save-alert'));
-
-// Export JSON as fallback
-document.querySelectorAll('[data-export]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const key  = btn.dataset.export;
-        const data = state.data[key];
-        if (!data) return;
-        const filenames = { slider: 'slider.json', misa: 'portfolio-misa.json', jaydem: 'portfolio-jaydem.json', news: 'news.json' };
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = filenames[key] || `${key}.json`;
-        a.click();
-        URL.revokeObjectURL(a.href);
-    });
-});
 
 // ─── ÜBER UNS MANAGER ─────────────────────────────────────────────────────────
 function ensureUU() {

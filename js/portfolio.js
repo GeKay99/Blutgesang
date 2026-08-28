@@ -6,7 +6,7 @@
  * If both fail, the hardcoded HTML in the page stays as-is.
  *
  * Called from artist detail pages:
- *   initPortfolio('misa') or initPortfolio('jaydem')
+ *   initPortfolio('misa') or initPortfolio(anySlugFromArtistsJson)
  *
  * On the artists overview page, initPortfolioPreview(artist, containerId)
  * renders a compact thumbnail strip.

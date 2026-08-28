@@ -4,17 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="img/logos/favicon.ico">
-    <title>Tattoo Artists Tuttlingen | Misa | Blutgesang Tattoo</title>
-    <meta name="description" content="Unser Tätowierer-Team in Tuttlingen: Misa (Fineline &amp; Blackwork). Portfolio ansehen und Termin vereinbaren.">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://blutgesangtattoo.de/artists.html">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="de_DE">
-    <meta property="og:title" content="Tattoo Artists Tuttlingen | Misa | Blutgesang Tattoo">
-    <meta property="og:description" content="Unser Tätowierer-Team in Tuttlingen: Misa (Fineline &amp; Blackwork). Portfolio ansehen und Termin vereinbaren.">
-    <meta property="og:url" content="https://blutgesangtattoo.de/artists.html">
-    <meta property="og:site_name" content="Blutgesang Tattoo">
-    <meta property="og:image" content="https://blutgesangtattoo.de/img/logos/logo.png">
+    <title>Tattoo Artist Portfolio | Blutgesang Tattoo</title>
+    <meta name="description" content="Tattoo Artist Portfolio – Blutgesang Tattoo, Tuttlingen.">
+    <meta name="robots" content="noindex, follow">
     <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
     <link href="https://fonts.bunny.net/css?family=Montserrat:wght@300;400;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -42,9 +34,7 @@
         </ul>
 
         <label for="nav-toggle" class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+            <span></span><span></span><span></span>
         </label>
 
         <div class="mobile-menu">
@@ -61,16 +51,28 @@
 </header>
 
 <main>
-    <section class="hero-sub">
-        <div class="hero-content">
-            <h1>Tattoo Artists in Tuttlingen</h1>
-            <p>Meister ihres Fachs – bereit für dein nächstes Projekt.</p>
+    <section class="artist-detail-header container">
+        <div class="detail-grid">
+            <div class="detail-image">
+                <img id="artist-photo" src="" alt="" style="display:none">
+            </div>
+            <div class="detail-text">
+                <span id="artist-spec"></span>
+                <h1 id="artist-name">Lädt…</h1>
+                <p id="artist-bio-detail"></p>
+                <div class="artist-contact-row" id="artist-contact-row"></div>
+            </div>
         </div>
     </section>
 
-    <section class="artist-detail-list container" id="artist-detail-list"></section>
+    <section class="portfolio-section container">
+        <h2 class="section-title">Portfolio</h2>
+        <div class="gallery-grid" id="gallery-grid"></div>
+        <div class="back-area">
+            <a href="artists.html" class="back-link">← Zurück zur Künstlerübersicht</a>
+        </div>
+    </section>
 </main>
-
 
 <footer class="site-footer">
     <div class="container footer-content">
@@ -109,10 +111,8 @@
 <script src="js/main.js"></script>
 <script src="js/portfolio.js"></script>
 <script src="js/artists.js"></script>
-<script>
-    renderArtistCards('artist-detail-list', 'detail');
-    renderFooterSocialLinks('footer-social-links');
-</script>
+<script src="js/artist-page.js"></script>
+<script>renderFooterSocialLinks('footer-social-links');</script>
 <script src="js/cookie-consent.js"></script>
 </body>
 </html>

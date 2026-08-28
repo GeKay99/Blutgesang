@@ -22,28 +22,46 @@ async function initSlider() {
     const { slides = [], interval = 5000 } = config;
     if (slides.length === 0) return;
 
+    // Slides are built without their real image/video source (except slide 0) so
+    // the browser doesn't fetch every slide at once — each slide's asset is only
+    // requested one rotation ahead of when it's actually needed (see loadSlide()).
     container.innerHTML = slides.map((s, i) => {
         const active = i === 0 ? ' active' : '';
         if (s.type === 'video') {
             return `<div class="slide${active}">
-                <video autoplay muted loop playsinline>
-                    <source src="${s.src}" type="video/mp4">
-                </video>
+                <video muted loop playsinline preload="none"></video>
             </div>`;
         }
-        return `<div class="slide${active}"
-                     style="background-image:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('${s.src}')"
-                     aria-label="${s.alt || ''}"></div>`;
+        return `<div class="slide${active}" aria-label="${s.alt || ''}"></div>`;
     }).join('');
+
+    const els = container.querySelectorAll('.slide');
+
+    function loadSlide(i) {
+        const el = els[i];
+        if (!el || el.dataset.loaded) return;
+        el.dataset.loaded = '1';
+        const s = slides[i];
+        if (s.type === 'video') {
+            const video = el.querySelector('video');
+            video.src = s.src;
+            video.play().catch(() => {});
+        } else {
+            el.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('${s.src}')`;
+        }
+    }
+
+    loadSlide(0);
+    if (slides.length > 1) loadSlide(1);
 
     if (slides.length <= 1) return;
 
     let current = 0;
     setInterval(() => {
-        const els = container.querySelectorAll('.slide');
         els[current].classList.remove('active');
         current = (current + 1) % els.length;
         els[current].classList.add('active');
+        loadSlide((current + 1) % els.length);
     }, interval);
 }
 

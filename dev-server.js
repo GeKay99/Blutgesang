@@ -135,8 +135,6 @@ async function handleLoad(req, res) {
 
     const files = {
         slider      : 'slider.json',
-        misa        : 'portfolio-misa.json',
-        jaydem      : 'portfolio-jaydem.json',
         news        : 'news.json',
         artists     : 'artists.json',
         'ueber-uns' : 'ueber-uns.json',
@@ -148,6 +146,13 @@ async function handleLoad(req, res) {
         const p = path.join(ROOT, 'content', name);
         try { data[key] = JSON.parse(fs.readFileSync(p, 'utf8')); }
         catch { data[key] = null; }
+    }
+
+    data.portfolios = {};
+    for (const slug of Object.keys(data.artists || {})) {
+        const p = path.join(ROOT, 'content', `portfolio-${slug}.json`);
+        try { data.portfolios[slug] = JSON.parse(fs.readFileSync(p, 'utf8')); }
+        catch { data.portfolios[slug] = { artist: slug, gallery: [] }; }
     }
 
     sendJson(res, 200, { ok: true, data });
@@ -210,13 +215,21 @@ function parseMultipart(body, boundary) {
 
 // ── Admin API: upload.php ─────────────────────────────────────────────────────
 const UPLOAD_TARGETS = {
-    misa        : 'img/portfolio/misa/',
-    jaydem      : 'img/portfolio/jaydem/',
     slider      : 'img/slider/',
     news        : 'img/news/',
     artists     : 'img/artists/',
     'ueber-uns' : 'img/ueber-uns/',
 };
+const SLUG_RE = /^[a-z0-9-]+$/;
+
+// Resolves a target key to a relative upload directory, supporting the
+// fixed targets above plus "portfolio:<slug>" for any artist slug.
+function resolveUploadDir(target) {
+    if (UPLOAD_TARGETS[target]) return UPLOAD_TARGETS[target];
+    const m = /^portfolio:([a-z0-9-]+)$/.exec(target || '');
+    if (m && SLUG_RE.test(m[1])) return `img/portfolio/${m[1]}/`;
+    return null;
+}
 const IMAGE_MIME = new Set(['image/jpeg','image/png','image/gif','image/webp','image/avif']);
 const VIDEO_MIME = new Set(['video/mp4','video/webm','video/ogg']);
 const MIME_EXT   = { 'image/jpeg':'jpg','image/png':'png','image/gif':'gif','image/webp':'webp','image/avif':'avif','video/mp4':'mp4','video/webm':'webm','video/ogg':'ogv' };
@@ -235,7 +248,8 @@ async function handleUpload(req, res) {
     const target   = parts['target'];
     const filePart = parts['file'];
 
-    if (!UPLOAD_TARGETS[target]) return sendJson(res, 400, { ok: false, error: 'Ungültiges Upload-Ziel' });
+    const relDir = resolveUploadDir(target);
+    if (!relDir) return sendJson(res, 400, { ok: false, error: 'Ungültiges Upload-Ziel' });
     if (!filePart || !filePart.data) return sendJson(res, 400, { ok: false, error: 'Keine Datei empfangen' });
     const isVideo = VIDEO_MIME.has(filePart.contentType) && target === 'slider';
     if (!IMAGE_MIME.has(filePart.contentType) && !isVideo) return sendJson(res, 400, { ok: false, error: 'Nur Bilder erlaubt; für Slider auch MP4, WebM' });
@@ -244,8 +258,6 @@ async function handleUpload(req, res) {
     const baseName = path.basename(filePart.filename, path.extname(filePart.filename));
     const safeName = baseName.replace(/[^a-zA-Z0-9_-]/g, '-').replace(/^-+|-+$/g, '') || 'upload';
     let   filename = safeName + '.' + ext;
-
-    const relDir   = UPLOAD_TARGETS[target];
     const absDir   = path.join(ROOT, relDir);
     if (!fs.existsSync(absDir)) fs.mkdirSync(absDir, { recursive: true });
 
@@ -287,20 +299,24 @@ async function handleSave(req, res) {
     const body    = await readBody(req);
     const allowed = {
         slider      : 'slider.json',
-        misa        : 'portfolio-misa.json',
-        jaydem      : 'portfolio-jaydem.json',
         news        : 'news.json',
         artists     : 'artists.json',
         'ueber-uns' : 'ueber-uns.json',
         impressum   : 'impressum.json',
     };
 
-    if (!allowed[body.key] || body.content == null)
+    let filename = allowed[body.key];
+    if (!filename) {
+        const m = /^portfolio:([a-z0-9-]+)$/.exec(body.key || '');
+        if (m) filename = `portfolio-${m[1]}.json`;
+    }
+
+    if (!filename || body.content == null)
         return sendJson(res, 400, { ok: false, error: 'Ungültiger Schlüssel oder fehlender Inhalt' });
 
     try {
         fs.writeFileSync(
-            path.join(ROOT, 'content', allowed[body.key]),
+            path.join(ROOT, 'content', filename),
             JSON.stringify(body.content, null, 2),
             'utf8');
         sendJson(res, 200, { ok: true });
@@ -351,6 +367,14 @@ function serveStatic(pathname, res) {
     if (!filePath.startsWith(ROOT + path.sep) && filePath !== ROOT) {
         res.writeHead(403); return res.end('Forbidden');
     }
+
+    // Mirror Apache's DirectoryIndex: serve index.html for directory requests
+    // (e.g. /admin/), which is how the site behaves on Strato.
+    try {
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+            filePath = path.join(filePath, 'index.html');
+        }
+    } catch { /* fall through to the 404 below */ }
 
     fs.readFile(filePath, (err, data) => {
         if (err) { res.writeHead(404); return res.end('Not found: ' + pathname); }

@@ -16,15 +16,18 @@ if (empty($_SESSION['authenticated'])) {
 $target = $_POST['target'] ?? '';
 
 $targets = [
-    'misa'      => 'img/portfolio/misa/',
-    'jaydem'    => 'img/portfolio/jaydem/',
     'slider'    => 'img/slider/',
     'news'      => 'img/news/',
     'artists'   => 'img/artists/',
     'ueber-uns' => 'img/ueber-uns/',
 ];
 
-if (!array_key_exists($target, $targets)) {
+$relDirFromTarget = $targets[$target] ?? null;
+if ($relDirFromTarget === null && preg_match('/^portfolio:([a-z0-9-]+)$/', $target, $m)) {
+    $relDirFromTarget = 'img/portfolio/' . $m[1] . '/';
+}
+
+if ($relDirFromTarget === null) {
     http_response_code(400);
     echo json_encode(['ok' => false, 'error' => 'Ungültiges Upload-Ziel']);
     exit;
@@ -78,7 +81,7 @@ $safeName     = trim($safeName, '-') ?: 'upload';
 $filename     = $safeName . '.' . $ext;
 
 $rootDir      = dirname(dirname(__DIR__));
-$relDir       = $targets[$target];
+$relDir       = $relDirFromTarget;
 $absDir       = $rootDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relDir);
 
 if (!is_dir($absDir) && !mkdir($absDir, 0755, true)) {

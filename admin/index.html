@@ -145,14 +145,7 @@
                     <div class="stat-num" id="stat-slides">–</div>
                     <div class="stat-label">Slider Bilder</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-num" id="stat-misa">–</div>
-                    <div class="stat-label">Portfolio Misa</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-num" id="stat-jaydem">–</div>
-                    <div class="stat-label">Portfolio Jaydem</div>
-                </div>
+                <div id="artist-stat-cards" style="display:contents"></div>
                 <div class="stat-card">
                     <div class="stat-num" id="stat-posts">–</div>
                     <div class="stat-label">News (veröffentlicht)</div>
@@ -197,46 +190,8 @@
                 <p>Portfolio-Bilder der Artists verwalten</p>
             </div>
 
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="tab-misa">Misa</button>
-                <button class="tab-btn" data-tab="tab-jaydem">Jaydem</button>
-            </div>
-
-            <!-- Misa Tab -->
-            <div id="tab-misa" class="tab-panel active">
-                <div id="misa-save-alert" class="alert" style="display:none"></div>
-                <ul id="portfolio-list-misa" class="item-list"></ul>
-
-                <div class="drop-zone" id="drop-misa" data-target="misa">
-                    <input type="file" accept="image/*" multiple hidden id="file-misa">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                    <p><strong>Bilder hierher ziehen</strong> oder klicken zum Auswählen</p>
-                    <p style="margin-top:4px;font-size:0.75rem">Dateien werden direkt in den Misa-Portfolio-Ordner hochgeladen</p>
-                    <div class="upload-status" id="status-misa"></div>
-                </div>
-                <div class="btn-group">
-                    <button id="save-misa-btn" class="btn btn-primary">Speichern</button>
-                    <button class="btn btn-secondary" data-export="misa">JSON herunterladen</button>
-                </div>
-            </div>
-
-            <!-- Jaydem Tab -->
-            <div id="tab-jaydem" class="tab-panel">
-                <div id="jaydem-save-alert" class="alert" style="display:none"></div>
-                <ul id="portfolio-list-jaydem" class="item-list"></ul>
-
-                <div class="drop-zone" id="drop-jaydem" data-target="jaydem">
-                    <input type="file" accept="image/*" multiple hidden id="file-jaydem">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                    <p><strong>Bilder hierher ziehen</strong> oder klicken zum Auswählen</p>
-                    <p style="margin-top:4px;font-size:0.75rem">Dateien werden direkt in den Jaydem-Portfolio-Ordner hochgeladen</p>
-                    <div class="upload-status" id="status-jaydem"></div>
-                </div>
-                <div class="btn-group">
-                    <button id="save-jaydem-btn" class="btn btn-primary">Speichern</button>
-                    <button class="btn btn-secondary" data-export="jaydem">JSON herunterladen</button>
-                </div>
-            </div>
+            <div class="tabs" id="portfolio-tabs"></div>
+            <div id="portfolio-panels"></div>
         </section>
 
         <!-- ── ARTISTS ───────────────────────────────────────────────── -->
@@ -244,83 +199,12 @@
             <div class="section-header">
                 <h1>Artists</h1>
                 <p>Künstlerprofile bearbeiten – Spezialisierung, Profilbild und Instagram</p>
+                <button id="add-artist-btn" class="btn btn-secondary btn-sm" style="margin-top:14px">+ Neuen Artist hinzufügen</button>
             </div>
             <div id="artists-save-alert" class="alert" style="display:none"></div>
 
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="tab-artist-misa">Misa</button>
-                <button class="tab-btn" data-tab="tab-artist-jaydem">Jaydem</button>
-            </div>
-
-            <!-- Misa Tab -->
-            <div id="tab-artist-misa" class="tab-panel active" style="max-width:560px">
-                <div class="form-group">
-                    <label>Profilbild</label>
-                    <div style="display:flex;gap:16px;align-items:center;margin-bottom:12px">
-                        <img id="preview-artist-misa" src="../img/artists/misa.png" alt="Misa"
-                             style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);"
-                             onerror="this.style.display='none'">
-                        <span style="color:var(--text-muted);font-size:0.8rem">Aktuelles Bild</span>
-                    </div>
-                    <div class="drop-zone drop-zone-sm" id="drop-artist-misa">
-                        <input type="file" accept="image/*" hidden id="file-artist-misa">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                        <p>Neues Bild hochladen (ersetzt aktuelles)</p>
-                        <div class="upload-status" id="status-artist-misa"></div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Spezialisierung (erscheint auf der Artist-Seite)</label>
-                    <input type="text" id="artist-misa-spec" placeholder="z.B. Fineline & Blackwork">
-                </div>
-                <div class="form-group">
-                    <label>Kurztext auf der Artists-Übersichtsseite</label>
-                    <textarea id="artist-misa-bio" rows="3" placeholder="Kurze Beschreibung für die Übersichtsseite (artists.html)"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Detailtext auf der Portfolio-Seite</label>
-                    <textarea id="artist-misa-bio-detail" rows="4" placeholder="Ausführlichere Beschreibung für die individuelle Portfolio-Seite (artist-misa.html)"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Instagram DM-Link</label>
-                    <input type="url" id="artist-misa-ig-dm" placeholder="https://ig.me/m/benutzername">
-                </div>
-            </div>
-
-            <!-- Jaydem Tab -->
-            <div id="tab-artist-jaydem" class="tab-panel" style="max-width:560px">
-                <div class="form-group">
-                    <label>Profilbild</label>
-                    <div style="display:flex;gap:16px;align-items:center;margin-bottom:12px">
-                        <img id="preview-artist-jaydem" src="../img/artists/jaydem.png" alt="Jaydem"
-                             style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);"
-                             onerror="this.style.display='none'">
-                        <span style="color:var(--text-muted);font-size:0.8rem">Aktuelles Bild</span>
-                    </div>
-                    <div class="drop-zone drop-zone-sm" id="drop-artist-jaydem">
-                        <input type="file" accept="image/*" hidden id="file-artist-jaydem">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                        <p>Neues Bild hochladen (ersetzt aktuelles)</p>
-                        <div class="upload-status" id="status-artist-jaydem"></div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Spezialisierung (erscheint auf der Artist-Seite)</label>
-                    <input type="text" id="artist-jaydem-spec" placeholder="z.B. Realistic & Dark Art">
-                </div>
-                <div class="form-group">
-                    <label>Kurztext auf der Artists-Übersichtsseite</label>
-                    <textarea id="artist-jaydem-bio" rows="3" placeholder="Kurze Beschreibung für die Übersichtsseite (artists.html)"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Detailtext auf der Portfolio-Seite</label>
-                    <textarea id="artist-jaydem-bio-detail" rows="4" placeholder="Ausführlichere Beschreibung für die individuelle Portfolio-Seite (artist-jaydem.html)"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Instagram DM-Link</label>
-                    <input type="url" id="artist-jaydem-ig-dm" placeholder="https://ig.me/m/benutzername">
-                </div>
-            </div>
+            <div class="tabs" id="artist-tabs"></div>
+            <div id="artist-panels"></div>
 
             <div class="btn-group" style="margin-top:8px">
                 <button id="save-artists-btn" class="btn btn-primary">Speichern</button>

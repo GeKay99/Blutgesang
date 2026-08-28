@@ -40,8 +40,7 @@ This means the JSON files in `content/` are auto-generated artifacts when PHP is
 | File | Managed by |
 |---|---|
 | `slider.json` | Admin → Slider section |
-| `portfolio-misa.json` | Auto-written by `api/portfolio.php` + Admin |
-| `portfolio-jaydem.json` | Same |
+| `portfolio-<slug>.json` | Auto-written by `api/portfolio.php` + Admin, one per artist slug in `artists.json` |
 | `news.json` | Admin → News section |
 | `artists.json` | Admin → Artists section |
 
@@ -53,28 +52,25 @@ This means the JSON files in `content/` are auto-generated artifacts when PHP is
 - All admin API endpoints live in `admin/api/`: `auth.php`, `load.php`, `save.php`, `upload.php`, `delete.php`
 - `admin/.htaccess` blocks direct web access to `config.php` and disables directory listing
 
-### Dynamic Artist Profiles (`js/artists.js`)
+### Artists are fully dynamic — no hardcoded names in code
 
-`applyAllArtists()` fetches `content/artists.json` and updates any element with:
-- `data-artist-img="misa|jaydem"` — sets `src`
-- `data-artist-spec="misa|jaydem"` — sets text content (the "Specialized in" span)
-- `data-artist-ig="misa|jaydem"` — sets `href` (Instagram DM link)
+`content/artists.json` is an object keyed by an arbitrary slug (e.g. `misa`), in display order. Each entry has `name`, `specializedIn`, `image`, `instagram`, `instagramDm`, `whatsapp`, `bio`, `bioDetail`. The admin's Artists/Portfolios sections render one tab per key in this object (`admin/admin.js`: `renderArtistTabs()`/`renderPortfolioTabs()`) — adding or removing an artist is done entirely through the admin UI ("+ Neuen Artist hinzufügen" / "Artist entfernen" buttons), never by editing code.
 
-This is loaded on every public page. The admin Artists section writes changes back to `artists.json` via `admin/api/save.php`.
+- `js/artists.js` fetches `artists.json` once and exposes:
+  - `applyAllArtists()` — legacy path, updates any static element with `data-artist-img/spec/ig/bio/bio-detail="<slug>"` (still used by `artist-misa.html`, which keeps its own hand-tuned SEO page).
+  - `renderArtistCards(containerId, variant)` — builds N artist `<article>` cards from scratch (`variant` is `'preview'`, `'preview-contact'`, or `'detail'`); used by `index.html`, `artists.html`, `ueber-uns.html` so the artist grid automatically reflects however many artists exist (the CSS grid, e.g. `.artist-grid { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }`, already flows for any count).
+  - `renderFooterSocialLinks(containerId)` — builds the footer "Folge uns" Instagram links from `artists.json`; used on every page's footer.
+  - `getArtistsData()` — exposes the cached fetch for other scripts (used by `js/artist-page.js`).
+- **Portfolio detail pages**: `artist-misa.html` is Misa's own static, hand-optimized SEO page (unchanged). Every other artist (including any added later) uses the generic **`artist.html?slug=<slug>`** template, populated at runtime by `js/artist-page.js` (title/meta/image/bio/contact row + calls `initPortfolio(slug)` from `js/portfolio.js`). `renderArtistCards()`'s `portfolioHref()` picks the right link automatically. If you ever want a new artist to get their own fully custom static SEO page instead, that's a manual step (copy `artist-misa.html`, add a `sitemap.xml` entry) — it does not happen automatically.
+- JSON-LD structured data (`employee`/`sameAs` in `index.html`'s `<head>`, `sameAs` in `anfahrt.html`) is **not** dynamic and must be updated by hand when an artist is added or removed.
 
-### Upload Targets
+### Upload & Save Targets
 
-Files uploaded via the admin map to these directories:
+Fixed targets: `slider` → `img/slider/`, `news` → `img/news/`, `artists` → `img/artists/`, `ueber-uns` → `img/ueber-uns/`. Portfolio uploads/saves use a `"portfolio:<slug>"` convention instead of one hardcoded key per artist:
+- Upload `target: "portfolio:<slug>"` → uploads into `img/portfolio/<slug>/` (auto-created if missing).
+- Save `key: "portfolio:<slug>"` → writes `content/portfolio-<slug>.json`.
 
-| Target key | Directory |
-|---|---|
-| `misa` | `img/portfolio/misa/` |
-| `jaydem` | `img/portfolio/jaydem/` |
-| `slider` | `img/slider/` |
-| `news` | `img/news/` |
-| `artists` | `img/artists/` |
-
-This mapping exists in four places and must be kept in sync: `admin/api/upload.php`, `admin/api/delete.php`, `dev-server.js` (`UPLOAD_TARGETS`), and the delete regex.
+`<slug>` is validated against `^[a-z0-9-]+$` wherever it's parsed. This mapping is implemented in `admin/api/upload.php`, `admin/api/save.php`, `admin/api/load.php` (PHP) and their `dev-server.js` equivalents (`resolveUploadDir()`, `handleSave`, `handleLoad`) — keep those in sync when changing it. `admin/api/delete.php` / `handleDelete` and `api/portfolio.php` / `handlePortfolio` already validate/scan by arbitrary slug and need no changes when artists are added.
 
 
 

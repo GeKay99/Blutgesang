@@ -15,8 +15,6 @@ if (empty($_SESSION['authenticated'])) {
 
 $files = [
     'slider'     => 'slider.json',
-    'misa'       => 'portfolio-misa.json',
-    'jaydem'     => 'portfolio-jaydem.json',
     'news'       => 'news.json',
     'artists'    => 'artists.json',
     'ueber-uns'  => 'ueber-uns.json',
@@ -31,6 +29,17 @@ foreach ($files as $key => $filename) {
         $result[$key] = ($decoded !== null) ? $decoded : null;
     } else {
         $result[$key] = null;
+    }
+}
+
+$result['portfolios'] = [];
+foreach (array_keys($result['artists'] ?? []) as $slug) {
+    $path = CONTENT_BASE . 'portfolio-' . $slug . '.json';
+    if (file_exists($path)) {
+        $decoded = json_decode(file_get_contents($path), true);
+        $result['portfolios'][$slug] = ($decoded !== null) ? $decoded : ['artist' => $slug, 'gallery' => []];
+    } else {
+        $result['portfolios'][$slug] = ['artist' => $slug, 'gallery' => []];
     }
 }
 

@@ -24,8 +24,6 @@ if (!is_array($data)) {
 
 $allowed = [
     'slider'     => 'slider.json',
-    'misa'       => 'portfolio-misa.json',
-    'jaydem'     => 'portfolio-jaydem.json',
     'news'       => 'news.json',
     'artists'    => 'artists.json',
     'ueber-uns'  => 'ueber-uns.json',
@@ -35,13 +33,18 @@ $allowed = [
 $key     = $data['key']     ?? '';
 $content = $data['content'] ?? null;
 
-if (!array_key_exists($key, $allowed) || $content === null) {
+$filename = $allowed[$key] ?? null;
+if ($filename === null && preg_match('/^portfolio:([a-z0-9-]+)$/', $key, $m)) {
+    $filename = 'portfolio-' . $m[1] . '.json';
+}
+
+if ($filename === null || $content === null) {
     http_response_code(400);
     echo json_encode(['ok' => false, 'error' => 'Ungültiger Schlüssel oder fehlender Inhalt']);
     exit;
 }
 
-$path = CONTENT_BASE . $allowed[$key];
+$path = CONTENT_BASE . $filename;
 $json = json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
 if ($json === false) {
